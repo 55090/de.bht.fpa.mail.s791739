@@ -22,7 +22,7 @@ public class Main extends Application {
         Parent root = FXMLLoader.load(getClass().getResource("/de/bht/fpa/mail/s791739/view/FXMLDocument.fxml"));
         
         
-        Scene scene = new Scene(root,800,600);
+        Scene scene = new Scene(root,900,600);
        
         
         stage.setScene(scene);
