@@ -17,7 +17,7 @@
                <Menu text="File">
                     <items>
                         <MenuItem id="fileOpen"    text="Open" />
-                        <MenuItem id="fileHistory" text="History" />
+                        <!--// <MenuItem id="fileHistory" text="History" />  //-->
                     </items>
                </Menu>
            </menus>

@@ -1,18 +1,25 @@
 package de.bht.fpa.mailApp.s791739.controller;
 
+import de.bht.fpa.mailApp.s791739.model.appLogic.FolderManagerIF;
 import de.bht.fpa.mailApp.s791739.model.data.Component;
 import de.bht.fpa.mailApp.s791739.model.data.FileElement;
 import de.bht.fpa.mailApp.s791739.model.data.Folder;
 import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.collections.ObservableList;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeItem.TreeModificationEvent;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.stage.DirectoryChooser;
 
 /**
  * Controller Class for FXMLDocument
@@ -36,25 +43,34 @@ public class FXMLDocumentController implements Initializable {
     /**
      * String of root path
      */
-    private final String S_ROOTPATH = "/";
+    private final String S_DEFAULT_ROOTPATH = "/";
     
     /**
      * File for initial path
      */
-    private final File ROOTPATH     = new File(S_ROOTPATH);
+    private final File DEFAULT_ROOTPATH     = new File(S_DEFAULT_ROOTPATH);
     
     /**
      * Dummy Element to show arrow of branch expander
      */
     private final TreeItem<Folder> DUMMY = new TreeItem<> ( new Folder(new File(""), true ) );
     
-    
+    /**
+     * FolderManager
+     */
+    private FolderManagerIF folderManager;
     
     /**
      * injection from FXMLDocument GUI
      */
     @FXML
     TreeView treeView;
+    
+    /**
+     * injection from FXMLDocument GUI
+     */
+    @FXML
+    MenuBar menuBar;
     
     /**
      * Constructor
@@ -70,26 +86,72 @@ public class FXMLDocumentController implements Initializable {
     @Override
     public void initialize(final URL location, final ResourceBundle resources) {
         configureTree();
+        configureMenue();
     }   
     
     /**
      * Method to initially configure tree
      */
-    public void configureTree(){
-	TreeItem<Component> rootItem = new TreeItem<> (new Folder(ROOTPATH, true), new ImageView( FOLDER_ICON )); 
+    private void configureTree(){
+	setTreeRoot(DEFAULT_ROOTPATH);
+    }
+    
+    /**
+     * Method to set root to tree
+     * @param rootPath given File to set as root for tree
+     */
+    private void setTreeRoot(final File rootPath){
+	TreeItem<Component> rootItem = new TreeItem<> (new Folder(rootPath, true), new ImageView( FOLDER_ICON )); 
 	rootItem.setExpanded(true);
         rootItem.addEventHandler(TreeItem.branchExpandedEvent(), (TreeItem.TreeModificationEvent <Component> e) -> handleExpandEvent(e));
         
         rootItem.addEventHandler(TreeItem.branchCollapsedEvent(), (TreeItem.TreeModificationEvent <Component> e) -> handleCollapseEvent(e));
 	treeView.setRoot(rootItem);
-	loadFolderContent(ROOTPATH, rootItem);
+	loadFolderContent(rootPath, rootItem);
+    }
+     
+    /**
+     * Method configures the Menu Items with event handler
+     */
+    private void configureMenue(){
+        menuBar.getMenus().stream().forEach( ( menu )-> { 
+            menu.getItems().stream().forEach( ( items )-> {
+                items.setOnAction( ( event )-> handleMenueEvent( event ) );
+            });
+        });
+    }
+    
+    /**
+     * Method handles the events coming from the menu items
+     * @param e event source
+     */
+    private void handleMenueEvent(Event e){
+        switch(((MenuItem)e.getSource()).getId()){
+            case "fileOpen":
+                File openNewRoot = openDirectoryChooser(); 
+                if (openNewRoot != null){
+                    System.out.println(openNewRoot.getAbsolutePath());
+                }
+            break;
+            //case "history": do sth.; break;
+        }
+    }
+    
+    /**
+     * Method opens a Window to chose a base directory
+     * @returns a File with the new chosen base directory (or null if no choice)
+     */
+    private File openDirectoryChooser(){
+        DirectoryChooser dc = new DirectoryChooser();
+        dc.setTitle("Choose Base Directory!");
+        return dc.showDialog(null); //returns File Instance with chosen directory / or null
     }
     
     /**
      * Callback method for TreeModificationEvents (return type TreeItem.branchExpandedEvent())
      * @param e TreeModificationEvent when expandable branch has been clicked
      */
-    public void handleExpandEvent(TreeModificationEvent <Component> e){
+    private void handleExpandEvent(TreeModificationEvent <Component> e){
         loadFolderContent(new File(e.getTreeItem().getValue().getPath()), e.getTreeItem());
     }
     
@@ -97,7 +159,7 @@ public class FXMLDocumentController implements Initializable {
      * Callback method for TreeModificationEvents (return type TreeItem.branchCollapsedEvent())
      * @param e TreeModificationEvent when expanded branch has been clicked to collapse
      */
-    public void handleCollapseEvent(TreeModificationEvent <Component> e){
+    private void handleCollapseEvent(TreeModificationEvent <Component> e){
         /**
          * node to reference the treeItem contained in the TreeModificationEvent
          */

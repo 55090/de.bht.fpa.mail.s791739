@@ -3,13 +3,6 @@ package de.bht.fpa.mailApp.s791739.model.appLogic;
 import de.bht.fpa.mailApp.s791739.model.data.Folder;
 import java.io.File;
 
-
-/*
- * This class manages a hierarchy of folders and their content which is loaded 
- * from a given directory path.
- * 
- * @author Simone Strippgen
- */
 public class FileManager implements FolderManagerIF {
 
     //top Folder of the managed hierarchy
@@ -22,7 +15,7 @@ public class FileManager implements FolderManagerIF {
      * @param file File which points to the top directory
      */
     public FileManager(File file) {
-       // hier kommt Ihr Code hin.
+       topFolder = new Folder(file, true);
     }
     
     /**
