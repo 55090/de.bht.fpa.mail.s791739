@@ -1,5 +1,6 @@
 package de.bht.fpa.mailApp.s791739.controller;
 
+import de.bht.fpa.mailApp.s791739.model.appLogic.FileManager;
 import de.bht.fpa.mailApp.s791739.model.appLogic.FolderManagerIF;
 import de.bht.fpa.mailApp.s791739.model.data.Component;
 import de.bht.fpa.mailApp.s791739.model.data.FileElement;
@@ -7,6 +8,7 @@ import de.bht.fpa.mailApp.s791739.model.data.Folder;
 import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -53,7 +55,7 @@ public class FXMLDocumentController implements Initializable {
     /**
      * Dummy Element to show arrow of branch expander
      */
-    private final TreeItem<Folder> DUMMY = new TreeItem<> ( new Folder(new File(""), true ) );
+    private final TreeItem<Component> DUMMY = new TreeItem<> ( new Folder(new File(""), true ) );
     
     /**
      * FolderManager
@@ -101,13 +103,13 @@ public class FXMLDocumentController implements Initializable {
      * @param rootPath given File to set as root for tree
      */
     private void setTreeRoot(final File rootPath){
-	TreeItem<Component> rootItem = new TreeItem<> (new Folder(rootPath, true), new ImageView( FOLDER_ICON )); 
+	folderManager = new FileManager(rootPath);
+        TreeItem<Component> rootItem = new TreeItem<> (new Folder(rootPath, true), new ImageView( FOLDER_ICON )); 
 	rootItem.setExpanded(true);
         rootItem.addEventHandler(TreeItem.branchExpandedEvent(), (TreeItem.TreeModificationEvent <Component> e) -> handleExpandEvent(e));
-        
         rootItem.addEventHandler(TreeItem.branchCollapsedEvent(), (TreeItem.TreeModificationEvent <Component> e) -> handleCollapseEvent(e));
 	treeView.setRoot(rootItem);
-	loadFolderContent(rootPath, rootItem);
+	loadTreeItemContents(rootPath, rootItem);
     }
      
     /**
@@ -131,6 +133,7 @@ public class FXMLDocumentController implements Initializable {
                 File openNewRoot = openDirectoryChooser(); 
                 if (openNewRoot != null){
                     System.out.println(openNewRoot.getAbsolutePath());
+                    setTreeRoot(openNewRoot);
                 }
             break;
             //case "history": do sth.; break;
@@ -152,7 +155,7 @@ public class FXMLDocumentController implements Initializable {
      * @param e TreeModificationEvent when expandable branch has been clicked
      */
     private void handleExpandEvent(TreeModificationEvent <Component> e){
-        loadFolderContent(new File(e.getTreeItem().getValue().getPath()), e.getTreeItem());
+        loadTreeItemContents(new File(e.getTreeItem().getValue().getPath()), e.getTreeItem());
     }
     
     /**
@@ -173,23 +176,24 @@ public class FXMLDocumentController implements Initializable {
      * @param path abstract File(path) of the TreeItem
      * @param node TreeItem
      */
-    public void loadFolderContent(final File path, final TreeItem node){
+    public void loadTreeItemContents(final File path, final TreeItem<Component> node){
+        Folder folder = (Folder)node.getValue();
         node.getChildren().remove( DUMMY );
-        if (path.listFiles()==null){
-            return;
-        }
-        try{
-            for ( File current_path : path.listFiles() ) {
-                if ( current_path.isDirectory() ) {
-                    addFolder( current_path, node );
-                } else {
-                    addFile( current_path, node );
+        folderManager.loadContent(folder);
+        
+        folder.getComponents().forEach((Component subComponent) -> {
+            TreeItem<Component> subItem;
+            if(subComponent instanceof Folder){
+                addFolder(new File(subComponent.getPath()), node);
+                if(subComponent.isExpandable()){
+                    addDummy(new TreeItem<>(subComponent));
                 }
+            } else {
+                addFile(new File(subComponent.getPath()), node);
             }
-        } catch (NullPointerException ne){
-            System.out.println("Zugriffsrechte fehlen für diese Operation");
-        }
+        });
     }
+    
     /**
      * Method adds a dummy folder to a directory treeItem, thus the Folder indicates to be expandable
      * @param node the node where the dummy element should be added
