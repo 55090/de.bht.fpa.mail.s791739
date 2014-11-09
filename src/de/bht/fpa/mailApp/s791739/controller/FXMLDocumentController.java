@@ -8,12 +8,9 @@ import de.bht.fpa.mailApp.s791739.model.data.Folder;
 import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
-import java.util.function.Consumer;
-import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeItem;
@@ -33,14 +30,12 @@ public class FXMLDocumentController implements Initializable {
     /**
      * Image for the folder visualization
      */
-    private final Image FOLDER_ICON   
-            = new Image( getClass().getResourceAsStream( "/de/bht/fpa/mailApp/s791739/model/data/icons/folder_Icon.png" ) );
+    private final Image FOLDER_ICON = new Image( getClass().getResourceAsStream( "/de/bht/fpa/mailApp/s791739/model/data/icons/folder_Icon.png" ) );
     
     /**
      * Image for the file visualization
      */
-    private final Image FILE_ICON
-            = new Image( getClass().getResourceAsStream( "/de/bht/fpa/mailApp/s791739/model/data/icons/file_Icon.png" ) );
+    private final Image FILE_ICON = new Image( getClass().getResourceAsStream( "/de/bht/fpa/mailApp/s791739/model/data/icons/file_Icon.png" ) );
     
     /**
      * String of root path
@@ -99,6 +94,17 @@ public class FXMLDocumentController implements Initializable {
     }
     
     /**
+     * Method configures the Menu Items with event handler
+     */
+    private void configureMenue(){
+        menuBar.getMenus().stream().forEach( ( menu )-> { 
+            menu.getItems().stream().forEach( ( items )-> {
+                items.setOnAction( ( event )-> handleMenueEvent( event ) );
+            });
+        });
+    }
+    
+    /**
      * Method to set root to tree
      * @param rootPath given File to set as root for tree
      */
@@ -111,18 +117,7 @@ public class FXMLDocumentController implements Initializable {
 	treeView.setRoot(rootItem);
 	loadTreeItemContents(rootPath, rootItem);
     }
-     
-    /**
-     * Method configures the Menu Items with event handler
-     */
-    private void configureMenue(){
-        menuBar.getMenus().stream().forEach( ( menu )-> { 
-            menu.getItems().stream().forEach( ( items )-> {
-                items.setOnAction( ( event )-> handleMenueEvent( event ) );
-            });
-        });
-    }
-    
+
     /**
      * Method handles the events coming from the menu items
      * @param e event source
@@ -147,7 +142,7 @@ public class FXMLDocumentController implements Initializable {
     private File openDirectoryChooser(){
         DirectoryChooser dc = new DirectoryChooser();
         dc.setTitle("Choose Base Directory!");
-        return dc.showDialog(null); //returns File Instance with chosen directory / or null
+        return dc.showDialog(null);
     }
     
     /**
@@ -181,7 +176,7 @@ public class FXMLDocumentController implements Initializable {
         node.getChildren().remove( DUMMY );
         folderManager.loadContent(folder);
         
-        folder.getComponents().forEach((Component subComponent) -> {
+        folder.getComponents().stream().forEach((Component subComponent) -> {
             TreeItem<Component> subItem;
             if(subComponent instanceof Folder){
                 addFolder(new File(subComponent.getPath()), node);
