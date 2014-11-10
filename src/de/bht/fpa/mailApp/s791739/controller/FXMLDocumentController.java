@@ -115,7 +115,7 @@ public class FXMLDocumentController implements Initializable {
         rootItem.addEventHandler(TreeItem.branchExpandedEvent(), (TreeItem.TreeModificationEvent <Component> e) -> handleExpandEvent(e));
         rootItem.addEventHandler(TreeItem.branchCollapsedEvent(), (TreeItem.TreeModificationEvent <Component> e) -> handleCollapseEvent(e));
 	treeView.setRoot(rootItem);
-	loadTreeItemContents(rootPath, rootItem);
+	loadTreeItemContents(rootItem);
     }
 
     /**
@@ -150,7 +150,7 @@ public class FXMLDocumentController implements Initializable {
      * @param e TreeModificationEvent when expandable branch has been clicked
      */
     private void handleExpandEvent(TreeModificationEvent <Component> e){
-        loadTreeItemContents(new File(e.getTreeItem().getValue().getPath()), e.getTreeItem());
+        loadTreeItemContents(e.getTreeItem());
     }
     
     /**
@@ -168,16 +168,14 @@ public class FXMLDocumentController implements Initializable {
     
     /**
      * Method removes all children a first (including dummy elements ) and then loads all children of a TreeItem
-     * @param path abstract File(path) of the TreeItem
      * @param node TreeItem
      */
-    public void loadTreeItemContents(final File path, final TreeItem<Component> node){
+    public void loadTreeItemContents(final TreeItem<Component> node){
         Folder folder = (Folder)node.getValue();
         node.getChildren().remove( DUMMY );
         folderManager.loadContent(folder);
         
         folder.getComponents().stream().forEach((Component subComponent) -> {
-            TreeItem<Component> subItem;
             if(subComponent instanceof Folder){
                 addFolder(new File(subComponent.getPath()), node);
                 if(subComponent.isExpandable()){
