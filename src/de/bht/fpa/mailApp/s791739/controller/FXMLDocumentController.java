@@ -6,11 +6,17 @@ import de.bht.fpa.mailApp.s791739.model.data.Component;
 import de.bht.fpa.mailApp.s791739.model.data.FileElement;
 import de.bht.fpa.mailApp.s791739.model.data.Folder;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
+import java.util.TreeSet;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.event.Event;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeItem;
@@ -18,7 +24,10 @@ import javafx.scene.control.TreeItem.TreeModificationEvent;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Pane;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 /**
  * Controller Class for FXMLDocument
@@ -70,6 +79,11 @@ public class FXMLDocumentController implements Initializable {
     MenuBar menuBar;
     
     /**
+     * Saves used directories
+     */
+    private TreeSet<File> historySet;
+    
+    /**
      * Constructor
      */
     public FXMLDocumentController(){
@@ -84,6 +98,7 @@ public class FXMLDocumentController implements Initializable {
     public void initialize(final URL location, final ResourceBundle resources) {
         configureTree();
         configureMenue();
+        historySet = new TreeSet<>();
     }   
     
     /**
@@ -108,7 +123,7 @@ public class FXMLDocumentController implements Initializable {
      * Method to set root to tree
      * @param rootPath given File to set as root for tree
      */
-    private void setTreeRoot(final File rootPath){
+    public void setTreeRoot(final File rootPath){
 	folderManager = new FileManager(rootPath);
         TreeItem<Component> rootItem = new TreeItem<> (new Folder(rootPath, true), new ImageView( FOLDER_ICON )); 
 	rootItem.setExpanded(true);
@@ -130,8 +145,13 @@ public class FXMLDocumentController implements Initializable {
                     System.out.println(openNewRoot.getAbsolutePath());
                     setTreeRoot(openNewRoot);
                 }
-            break;
-            //case "history": do sth.; break;
+                if ( openNewRoot != DEFAULT_ROOTPATH ){
+                    historySet.add(openNewRoot);
+                }
+                break;
+            case "fileHistory": showHistoryView(); 
+                
+                break;
         }
     }
     
@@ -141,7 +161,7 @@ public class FXMLDocumentController implements Initializable {
      */
     private File openDirectoryChooser(){
         DirectoryChooser dc = new DirectoryChooser();
-        dc.setTitle("Choose Base Directory!");
+        dc.setTitle("Select new Base Directory!");
         return dc.showDialog(null);
     }
     
@@ -217,5 +237,34 @@ public class FXMLDocumentController implements Initializable {
     public void addFile( final File path, final TreeItem node ){
         TreeItem<FileElement> file = new TreeItem<> ( new FileElement( path ), new ImageView( FILE_ICON ));
         node.getChildren().add(file);
+    }
+    
+    /**
+     * Method configures and shows the history view
+     */
+    private void showHistoryView() {
+        Stage editStage = new Stage(StageStyle.UTILITY);
+        editStage.setTitle("Select Base Directory");
+        URL location = getClass().getResource("/de/bht/fpa/mailApp/s791739/view/FXMLHistory.fxml");
+
+        FXMLLoader fxmlLoader = new FXMLLoader();
+        fxmlLoader.setLocation(location);
+        fxmlLoader.setController(new HistoryController(this));
+        try {
+            Pane myPane = (Pane) fxmlLoader.load();
+            Scene myScene = new Scene(myPane);
+            editStage.setScene(myScene);
+            editStage.show();
+        } catch (IOException ex) {
+            Logger.getLogger(FXMLDocumentController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    /**
+     * returns the history list of used directories
+     * @return 
+     */
+    public TreeSet<File>  getHistorySet() {
+        return historySet;
     }
 }
