@@ -31,8 +31,8 @@ import javafx.stage.StageStyle;
 
 /**
  * Controller Class for FXMLDocument
- * @author András Bucsi
- * @version 1.0
+ * @author Marco Kollosche, András Bucsi (FPA Strippgen)
+ * @version Aufgabe 3 2014-11-13
  */
 public class FXMLDocumentController implements Initializable {
     

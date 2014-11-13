@@ -7,7 +7,6 @@ import java.util.List;
  * 
  * @author Simone Strippgen
  */
-
 public abstract class Component {
     // absolute directory path to this component
     private String path;

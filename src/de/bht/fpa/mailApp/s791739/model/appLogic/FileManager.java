@@ -3,7 +3,11 @@ package de.bht.fpa.mailApp.s791739.model.appLogic;
 import de.bht.fpa.mailApp.s791739.model.data.FileElement;
 import de.bht.fpa.mailApp.s791739.model.data.Folder;
 import java.io.File;
-
+/**
+ * Class manages the composite pattern of files and folders
+ * @author Marco Kollosche, András Bucsi (FPA Strippgen)
+ * @version Aufgabe 3 2014-11-13
+ */
 public class FileManager implements FolderManagerIF {
 
     //top Folder of the managed hierarchy

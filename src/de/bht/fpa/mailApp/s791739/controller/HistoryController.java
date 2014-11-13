@@ -13,6 +13,12 @@ import javafx.scene.control.SelectionMode;
 import javafx.stage.Stage;
 import javafx.stage.Window;
  
+/**
+ * Controller Class for the history view of used directories
+ * 
+ * @author Marco Kollosche, András Bucsi (FPA Strippgen)
+ * @version Aufgabe 3 Zusatz 2014-11-13
+ */
 public class HistoryController implements Initializable{
 
     /**
