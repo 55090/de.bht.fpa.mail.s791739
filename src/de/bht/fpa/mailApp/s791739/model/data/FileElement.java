@@ -7,7 +7,6 @@ import java.io.File;
  * 
  * @author Simone Strippgen
  */
-
 public class FileElement extends Component {
 
     public FileElement(File path) {

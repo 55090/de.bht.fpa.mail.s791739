@@ -8,8 +8,8 @@ import javafx.stage.Stage;
 
 /**
  * Start class for Application
- * @author András Bucsi
- * @version 1.0
+ * @author Marco Kollosche, András Bucsi (FPA Strippgen)
+ * @version Aufgabe 3 2014-11-13
  */
 public class Main extends Application {
 

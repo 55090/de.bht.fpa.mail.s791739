@@ -1,16 +1,26 @@
 package de.bht.fpa.mailApp.s791739.controller;
 
-import de.bht.fpa.mailApp.s791739.model.appLogic.FileManager;
-import de.bht.fpa.mailApp.s791739.model.appLogic.FolderManagerIF;
+import de.bht.fpa.mailApp.s791739.model.applicationLogic.EmailManagerIF;
+import de.bht.fpa.mailApp.s791739.model.applicationLogic.FileManager;
+import de.bht.fpa.mailApp.s791739.model.applicationLogic.FolderManagerIF;
+import de.bht.fpa.mailApp.s791739.model.applicationLogic.MailManager;
 import de.bht.fpa.mailApp.s791739.model.data.Component;
 import de.bht.fpa.mailApp.s791739.model.data.FileElement;
 import de.bht.fpa.mailApp.s791739.model.data.Folder;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
+import java.util.TreeSet;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.beans.Observable;
+import javafx.beans.value.ObservableValue;
 import javafx.event.Event;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeItem;
@@ -18,24 +28,32 @@ import javafx.scene.control.TreeItem.TreeModificationEvent;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Pane;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 /**
  * Controller Class for FXMLDocument
- * @author András Bucsi
- * @version 1.0
+ * @author Marco Kollosche, András Bucsi (FPA Strippgen)
+ * @version Aufgabe 3 2014-11-13
  */
 public class FXMLDocumentController implements Initializable {
     
     /**
      * Image for the folder visualization
      */
-    private final Image FOLDER_ICON = new Image( getClass().getResourceAsStream( "/de/bht/fpa/mailApp/s791739/model/data/icons/folder_Icon.png" ) );
+    private final Image FOLDER_ICON      = new Image( getClass().getResourceAsStream( "/de/bht/fpa/mailApp/s791739/model/data/icons/folder_Icon.png" ) );
+    
+    /**
+     * Image for the folder visualization
+     */
+    private final Image FOLDER_OPEN_ICON = new Image( getClass().getResourceAsStream( "/de/bht/fpa/mailApp/s791739/model/data/icons/folder_open_Icon.png" ) );
     
     /**
      * Image for the file visualization
      */
-    private final Image FILE_ICON = new Image( getClass().getResourceAsStream( "/de/bht/fpa/mailApp/s791739/model/data/icons/file_Icon.png" ) );
+    private final Image FILE_ICON        = new Image( getClass().getResourceAsStream( "/de/bht/fpa/mailApp/s791739/model/data/icons/file_Icon.png" ) );
     
     /**
      * String of root path
@@ -58,6 +76,11 @@ public class FXMLDocumentController implements Initializable {
     private FolderManagerIF folderManager;
     
     /**
+     * E-Mail manager
+     */
+    private EmailManagerIF mailManager;
+    
+    /**
      * injection from FXMLDocument GUI
      */
     @FXML
@@ -68,6 +91,13 @@ public class FXMLDocumentController implements Initializable {
      */
     @FXML
     MenuBar menuBar;
+    
+    /**
+     * Saves used directories
+     */
+    private TreeSet<File> historySet;
+    
+    
     
     /**
      * Constructor
@@ -84,13 +114,16 @@ public class FXMLDocumentController implements Initializable {
     public void initialize(final URL location, final ResourceBundle resources) {
         configureTree();
         configureMenue();
+        historySet = new TreeSet<>();
     }   
     
     /**
      * Method to initially configure tree
      */
     private void configureTree(){
-	setTreeRoot(DEFAULT_ROOTPATH);
+	folderManager = new FileManager(DEFAULT_ROOTPATH);
+        setTreeRoot(DEFAULT_ROOTPATH);
+        mailManager = new MailManager();
     }
     
     /**
@@ -108,12 +141,15 @@ public class FXMLDocumentController implements Initializable {
      * Method to set root to tree
      * @param rootPath given File to set as root for tree
      */
-    private void setTreeRoot(final File rootPath){
-	folderManager = new FileManager(rootPath);
-        TreeItem<Component> rootItem = new TreeItem<> (new Folder(rootPath, true), new ImageView( FOLDER_ICON )); 
+    public void setTreeRoot(final File rootPath){
+	folderManager.setTopFolder(rootPath);
+        
+        TreeItem<Component> rootItem = new TreeItem<> (folderManager.getTopFolder(), new ImageView( FOLDER_OPEN_ICON )); 
 	rootItem.setExpanded(true);
-        rootItem.addEventHandler(TreeItem.branchExpandedEvent(), (TreeItem.TreeModificationEvent <Component> e) -> handleExpandEvent(e));
+        rootItem.addEventHandler(TreeItem.branchExpandedEvent(),  (TreeItem.TreeModificationEvent <Component> e) -> handleExpandEvent(e));
         rootItem.addEventHandler(TreeItem.branchCollapsedEvent(), (TreeItem.TreeModificationEvent <Component> e) -> handleCollapseEvent(e));
+        
+        treeView.getFocusModel().focusedItemProperty().addListener((ObservableValue observable, Object oldValue, Object newValue) -> handleEmailEvent((TreeItem<Component>) newValue));
 	treeView.setRoot(rootItem);
 	loadTreeItemContents(rootItem);
     }
@@ -130,8 +166,13 @@ public class FXMLDocumentController implements Initializable {
                     System.out.println(openNewRoot.getAbsolutePath());
                     setTreeRoot(openNewRoot);
                 }
-            break;
-            //case "history": do sth.; break;
+                if ( openNewRoot != DEFAULT_ROOTPATH ){
+                    historySet.add(openNewRoot);
+                }
+                break;
+            case "fileHistory": showHistoryView(); 
+                
+                break;
         }
     }
     
@@ -141,7 +182,7 @@ public class FXMLDocumentController implements Initializable {
      */
     private File openDirectoryChooser(){
         DirectoryChooser dc = new DirectoryChooser();
-        dc.setTitle("Choose Base Directory!");
+        dc.setTitle("Select new Base Directory!");
         return dc.showDialog(null);
     }
     
@@ -151,6 +192,7 @@ public class FXMLDocumentController implements Initializable {
      */
     private void handleExpandEvent(TreeModificationEvent <Component> e){
         loadTreeItemContents(e.getTreeItem());
+        e.getTreeItem().setGraphic(new ImageView(FOLDER_OPEN_ICON));
     }
     
     /**
@@ -162,10 +204,21 @@ public class FXMLDocumentController implements Initializable {
          * node to reference the treeItem contained in the TreeModificationEvent
          */
         TreeItem node = e.getTreeItem();
+        e.getTreeItem().setGraphic(new ImageView(FOLDER_ICON));
         node.getChildren().removeAll(node.getChildren());
         addDummy(node);
     }
     
+    /**
+     * Method responds to a ChangeEvent and loads all mails if contained in that folder
+     * @param node folder that was clicked / fired the event/change
+     */
+    private void handleEmailEvent(TreeItem<Component> node) {
+        if (node != null) {
+            mailManager.printMails( mailManager.loadMails( (Folder) node.getValue() ) );
+        }
+    }
+   
     /**
      * Method removes all children a first (including dummy elements ) and then loads all children of a TreeItem
      * @param node TreeItem
@@ -177,12 +230,7 @@ public class FXMLDocumentController implements Initializable {
         
         folder.getComponents().stream().forEach((Component subComponent) -> {
             if(subComponent instanceof Folder){
-                addFolder(new File(subComponent.getPath()), node);
-                if(subComponent.isExpandable()){
-                    addDummy(new TreeItem<>(subComponent));
-                }
-            } else {
-                addFile(new File(subComponent.getPath()), node);
+                addFolder(new File(subComponent.getPath()), node, subComponent.isExpandable());
             }
         });
     }
@@ -199,11 +247,11 @@ public class FXMLDocumentController implements Initializable {
      * Method adds a folder to a parent TreeItem
      * @param path File path of the folder that shall be added
      * @param node parent TreeItem
+     * @param isExpandable indicates whether the folder contains further folders
      */
-    public void addFolder( final File path, final TreeItem node ){
-        boolean isExpandable = !(path.listFiles()==null);
+    public void addFolder( final File path, final TreeItem node , final boolean isExpandable){
         TreeItem<Folder> folder = new TreeItem<> ( new Folder(path, isExpandable ), new ImageView( FOLDER_ICON ));
-        if(isExpandable){
+        if (isExpandable){
             addDummy(folder);
         }
         node.getChildren().add(folder);
@@ -217,5 +265,34 @@ public class FXMLDocumentController implements Initializable {
     public void addFile( final File path, final TreeItem node ){
         TreeItem<FileElement> file = new TreeItem<> ( new FileElement( path ), new ImageView( FILE_ICON ));
         node.getChildren().add(file);
+    }
+    
+    /**
+     * Method configures and shows the history view
+     */
+    private void showHistoryView() {
+        Stage editStage = new Stage(StageStyle.UTILITY);
+        editStage.setTitle("Select Base Directory");
+        URL location = getClass().getResource("/de/bht/fpa/mailApp/s791739/view/FXMLHistory.fxml");
+
+        FXMLLoader fxmlLoader = new FXMLLoader();
+        fxmlLoader.setLocation(location);
+        fxmlLoader.setController(new HistoryController(this));
+        try {
+            Pane myPane = (Pane) fxmlLoader.load();
+            Scene myScene = new Scene(myPane);
+            editStage.setScene(myScene);
+            editStage.show();
+        } catch (IOException ex) {
+            Logger.getLogger(FXMLDocumentController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    /**
+     * returns the history list of used directories
+     * @return 
+     */
+    public TreeSet<File>  getHistorySet() {
+        return historySet;
     }
 }

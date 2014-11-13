@@ -1,9 +1,13 @@
-package de.bht.fpa.mailApp.s791739.model.appLogic;
+package de.bht.fpa.mailApp.s791739.model.applicationLogic;
 
-import de.bht.fpa.mailApp.s791739.model.data.FileElement;
 import de.bht.fpa.mailApp.s791739.model.data.Folder;
 import java.io.File;
 
+/**
+ * Class manages the composite pattern of files and folders
+ * @author Marco Kollosche, András Bucsi (FPA Strippgen)
+ * @version Aufgabe 3 2014-11-13
+ */
 public class FileManager implements FolderManagerIF {
 
     //top Folder of the managed hierarchy
@@ -28,14 +32,14 @@ public class FileManager implements FolderManagerIF {
     @Override
     public void loadContent( final Folder f ) {
         final File folderPath = new File( f.getPath() );
-        if ( isExpandable( folderPath ) ) {
+        if ( hasSubFolders( folderPath ) ) {
             f.getComponents().removeAll( f.getComponents() );
             for( final File currentPath : folderPath.listFiles() ){
                 if( currentPath.isDirectory() ){
-                    f.addComponent( new Folder( currentPath, isExpandable( currentPath ) ) );
-                } else {
+                    f.addComponent( new Folder( currentPath, hasSubFolders( currentPath ) ) );
+                } /*else {
                     f.addComponent( new FileElement( currentPath ) );
-                }
+                }*/
             }
         }
     }
@@ -45,8 +49,16 @@ public class FileManager implements FolderManagerIF {
      * @param f_path current path of the directory (type File)
      * @return returns boolean 'true' if the directory contains more files/folders, else 'false'
      */
-    private boolean isExpandable( final File f_path ){
-        return f_path.listFiles() != null;
+    private boolean hasSubFolders( final File f_path ){
+        File[] files = f_path.listFiles();
+        if(files != null){
+            for(File f : files){
+                if (f.isDirectory()){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -56,5 +68,12 @@ public class FileManager implements FolderManagerIF {
     @Override
     public Folder getTopFolder() {
         return topFolder;
+    }
+
+    @Override
+    public void setTopFolder(final File file) {
+        topFolder.getComponents().removeAll(topFolder.getComponents());
+        topFolder = new Folder( file, true );
+        
     }
 }
