@@ -14,7 +14,6 @@ import java.util.TreeSet;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.beans.Observable;
 import javafx.beans.value.ObservableValue;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -58,7 +57,7 @@ public class FXMLDocumentController implements Initializable {
     /**
      * String of root path
      */
-    private final String S_DEFAULT_ROOTPATH = "/";
+    private final String S_DEFAULT_ROOTPATH = "C:/Users/Me/Desktop/Account";
     
     /**
      * File for initial path
@@ -123,6 +122,7 @@ public class FXMLDocumentController implements Initializable {
     private void configureTree(){
 	folderManager = new FileManager(DEFAULT_ROOTPATH);
         setTreeRoot(DEFAULT_ROOTPATH);
+        treeView.getFocusModel().focusedItemProperty().addListener((ObservableValue observable, Object oldValue, Object newValue) -> handleEmailEvent((TreeItem<Component>) newValue));
         mailManager = new MailManager();
     }
     
@@ -146,10 +146,10 @@ public class FXMLDocumentController implements Initializable {
         
         TreeItem<Component> rootItem = new TreeItem<> (folderManager.getTopFolder(), new ImageView( FOLDER_OPEN_ICON )); 
 	rootItem.setExpanded(true);
+        
         rootItem.addEventHandler(TreeItem.branchExpandedEvent(),  (TreeItem.TreeModificationEvent <Component> e) -> handleExpandEvent(e));
         rootItem.addEventHandler(TreeItem.branchCollapsedEvent(), (TreeItem.TreeModificationEvent <Component> e) -> handleCollapseEvent(e));
         
-        treeView.getFocusModel().focusedItemProperty().addListener((ObservableValue observable, Object oldValue, Object newValue) -> handleEmailEvent((TreeItem<Component>) newValue));
 	treeView.setRoot(rootItem);
 	loadTreeItemContents(rootItem);
     }
@@ -162,13 +162,14 @@ public class FXMLDocumentController implements Initializable {
         switch(((MenuItem)e.getSource()).getId()){
             case "fileOpen":
                 File openNewRoot = openDirectoryChooser(); 
-                if (openNewRoot != null){
-                    System.out.println(openNewRoot.getAbsolutePath());
+                if (openNewRoot == null){
+                    break;
+                } else{
                     setTreeRoot(openNewRoot);
-                }
-                if ( openNewRoot != DEFAULT_ROOTPATH ){
-                    historySet.add(openNewRoot);
-                }
+                    if ( openNewRoot != DEFAULT_ROOTPATH ){
+                        historySet.add(openNewRoot);
+                    }
+                }  
                 break;
             case "fileHistory": showHistoryView(); 
                 
