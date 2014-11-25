@@ -9,8 +9,8 @@ import java.io.File;
  */
 public class FileElement extends Component {
 
-    public FileElement(File path) {
-        super(path);
+    public FileElement( final File path ) {
+        super( path );
     }
 
     @Override

@@ -11,7 +11,7 @@ import java.io.File;
 public class FileManager implements FolderManagerIF {
 
     //top Folder of the managed hierarchy
-    Folder topFolder;
+    protected Folder topFolder;
 
     /**
      * Constructs a new FileManager object which manages a folder hierarchy, 

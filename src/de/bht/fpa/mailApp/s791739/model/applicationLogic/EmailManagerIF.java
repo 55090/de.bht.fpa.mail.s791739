@@ -14,11 +14,11 @@ public interface EmailManagerIF {
      * @param folder
      * @return
      */
-    public Folder loadMails(final Folder folder);
+    public Folder loadMails( final Folder folder );
     
     /**
      *
      * @param folder
      */
-    public void printMails(final Folder folder);
+    public void printMails( final Folder folder );
 }

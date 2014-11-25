@@ -23,13 +23,13 @@ public class MailManager implements EmailManagerIF {
      * @return folder with added emails
      */
     @Override
-    public Folder loadMails(Folder folder) {
-        if (!folder.getEmails().isEmpty()){
+    public Folder loadMails( final Folder folder ) {
+        if ( !folder.getEmails().isEmpty() ){
             return folder;
         }
-        for (final File filePath : new File( folder.getPath() ).listFiles() ){
-            if(filePath.getName().endsWith(".xml")){
-                folder.addEmail(JAXB.unmarshal(filePath, Email.class));
+        for ( final File filePath : new File( folder.getPath() ).listFiles() ){
+            if( filePath.getName().endsWith(".xml") ){
+                folder.addEmail( JAXB.unmarshal( filePath, Email.class ) );
             }
         }
         return folder;
@@ -40,15 +40,14 @@ public class MailManager implements EmailManagerIF {
      * @param folder folder containing emails
      */
     @Override
-    public void printMails(Folder folder) {
+    public void printMails( final Folder folder ) {
         List<Email> mails = folder.getEmails();
         System.out.println( "Selected directory: " + folder.getPath() );
         System.out.println( "Number of emails: "   + mails.size() );
-        mails.stream().forEach((Email email_item) -> {
+        mails.stream().forEach( ( Email email_item ) -> {
             System.out.printf("[Email: sender=%s received=%s subject=%s] %n", email_item.getSender()   , 
                                                                               email_item.getReceived() , 
                                                                               email_item.getSubject()  );
         });
     }
-    
 }

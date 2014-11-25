@@ -22,7 +22,7 @@ public interface FolderManagerIF {
      * Sets new root folder.
      * @param file 
      */
-    public void setTopFolder(final File file);
+    public void setTopFolder( final File file );
     
     
     /**
@@ -31,5 +31,5 @@ public interface FolderManagerIF {
      * @param folder the folder into which the content of the corresponding 
      *               directory should be loaded
      */
-    void loadContent(final Folder folder);     
+    void loadContent( final Folder folder );     
 }

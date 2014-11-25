@@ -48,7 +48,7 @@ public class HistoryController implements Initializable{
      * History View Controller Constructor
      * @param fdController controller of the main stage / view
      */
-    public HistoryController(final FXMLDocumentController fdController){
+    public HistoryController( final FXMLDocumentController fdController ){
         this.fdController = fdController;
     }
    
@@ -59,9 +59,9 @@ public class HistoryController implements Initializable{
      * @param resources The resources used to localize the root object, or null if the root object was not localized.
      */
     @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        history_cancel. setOnAction((ActionEvent event) -> handleButtonEvent(event));
-        history_open.   setOnAction((ActionEvent event) -> handleButtonEvent(event));
+    public void initialize( final URL location, final ResourceBundle resources ) {
+        history_cancel. setOnAction( ( ActionEvent event ) -> handleButtonEvent( event ) );
+        history_open.   setOnAction( ( ActionEvent event ) -> handleButtonEvent( event ) );
         
         configureListView();
         
@@ -71,12 +71,12 @@ public class HistoryController implements Initializable{
      * Method handles events originating from buttons of the history view
      * @param event event source from buttons of the hstory view
      */
-    private void handleButtonEvent(ActionEvent event) {
+    private void handleButtonEvent( final ActionEvent event ) {
         switch( ( (Button) event.getSource() ).getId() ){
-            case "history_open":    fdController.setTreeRoot(history_list_view.getSelectionModel().getSelectedItem());
-                                    close(history_open.getScene().getWindow());
+            case "history_open":    fdController.setTreeRoot( history_list_view.getSelectionModel().getSelectedItem() );
+                                    close( history_open.getScene().getWindow() );
                                     break;
-            case "history_cancel":  close(history_cancel.getScene().getWindow());
+            case "history_cancel":  close( history_cancel.getScene().getWindow() );
                                     break;
             default:                break;
         }
@@ -88,15 +88,15 @@ public class HistoryController implements Initializable{
      * if the TreeSet is empty it adds a default File to the list...
      */
     private void configureListView() {
-        history_list_view.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        history_list_view.getItems().removeAll(history_list_view.getItems());
+        history_list_view.getSelectionModel().setSelectionMode( SelectionMode.SINGLE );
+        history_list_view.getItems().removeAll( history_list_view.getItems() );
         
         TreeSet<File> historySet = fdController.getHistorySet();
         if(historySet.isEmpty()){
-            history_list_view.getItems().add(new File("no history, yet..."));
-            history_open.setDisable(true);
+            history_list_view.getItems().add( new File( "no history, yet..." ) );
+            history_open.setDisable( true );
         } else {
-            history_list_view.getItems().addAll(historySet);
+            history_list_view.getItems().addAll( historySet );
         }
         
     }
@@ -105,7 +105,7 @@ public class HistoryController implements Initializable{
      * Method closes the View
      * @param window origin view
      */
-    private void close(Window window) {
+    private void close( final Window window ) {
         ( (Stage) window ).close();
     }
 }

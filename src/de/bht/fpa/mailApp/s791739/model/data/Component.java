@@ -13,17 +13,17 @@ public abstract class Component {
     // name of the component (without path)
     private String name;
 
-    public Component(final File path) {
+    public Component( final File path ) {
         this.path = path.getAbsolutePath();
         this.name = path.getName();
     }
 
-    public void addComponent(final Component comp) {
-        throw new UnsupportedOperationException("Not supported."); //To change body of generated methods, choose Tools | Templates.
+    public void addComponent( final Component comp ) {
+        throw new UnsupportedOperationException( "Not supported." );
     }
 
     public List<Component> getComponents() {
-        throw new UnsupportedOperationException("Not supported.");
+        throw new UnsupportedOperationException( "Not supported." );
     }
     
     /**
@@ -40,11 +40,11 @@ public abstract class Component {
         return name;
     }
 
-    public void setName(final String name) {
+    public void setName( final String name ) {
         this.name = name;
     }
 
-    public void setPath(final String p) {
+    public void setPath( final String p ) {
         path = p;
     }
 
