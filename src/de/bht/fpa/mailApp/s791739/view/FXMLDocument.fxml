@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.*?>
@@ -28,3 +29,45 @@
       <!--// SPLIT PANE END (PARENT) //-->
    </children>
 </VBox>
+=======
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.effect.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox id="AnchorView" prefHeight="600.0" prefWidth="900.0" style="-fx-background-color: #000;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.bht.fpa.mailApp.s791739.controller.FXMLDocumentController">
+   <children>
+       <!--// MENU BAR START //-->
+       <MenuBar fx:id="menuBar">
+           <menus>
+               <Menu text="Account" />
+               <Menu text="File">
+                    <items>
+                        <MenuItem id="fileOpen"    text="Open" />
+                        <MenuItem id="fileHistory" text="History" />
+                    </items>
+               </Menu>
+           </menus>
+       </MenuBar>
+       <!--// MENU BAR END //-->
+       
+      <!--// SPLIT PANE START //--> 
+      <SplitPane id="HorizontalSplitView" dividerPositions="0.3" VBox.vgrow="ALWAYS" style="-fx-border-color: #fff; -fx-border-width: 10;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <items>
+            <TreeView fx:id="treeView" />
+            <SplitPane id="VerticalSplitView" dividerPositions="0.4" orientation="VERTICAL">
+               <items>
+                  <Pane id="ListView"       style="-fx-background-color: #f90;" />
+                  <Pane id="ContentView"    style="-fx-background-color: #9f0;" />
+               </items>
+            </SplitPane>
+         </items>
+      </SplitPane>
+   </children>
+</VBox>
+>>>>>>> 40db066346da37007cc14cb546f6f3ac75c1b667

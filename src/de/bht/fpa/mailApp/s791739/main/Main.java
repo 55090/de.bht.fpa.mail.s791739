@@ -8,25 +8,24 @@ import javafx.stage.Stage;
 
 /**
  * Start class for Application
- * @author András Bucsi
- * @version 1.0
+ * @author Marco Kollosche, András Bucsi (FPA Strippgen)
+ * @version Aufgabe 3 2014-11-13
  */
 public class Main extends Application {
 
     @Override
-    public void start(Stage stage) throws Exception {
-	Parent root = FXMLLoader.load(getClass().getResource("/de/bht/fpa/mailApp/s791739/view/FXMLDocument.fxml"));
-	Scene scene = new Scene(root);
+    public void start( Stage stage ) throws Exception {
+	Parent root = FXMLLoader.load( getClass().getResource( "/de/bht/fpa/mailApp/s791739/view/FXMLDocument.fxml" ) );
+	Scene scene = new Scene( root );
 	
-	stage.setScene(scene);
+	stage.setScene( scene );
 	stage.show();
     }
 
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
-	launch(args);
+    public static void main( final String[] args ) {
+	launch( args );
     }
-
 }
