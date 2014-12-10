@@ -16,7 +16,7 @@
                <Menu text="Account" />
                <Menu text="File">
                     <items>
-                        <MenuItem id="fileOpen"    text="Open" />
+                        <MenuItem id="fileOpen" text="Open" />
                         <MenuItem id="fileHistory" text="History" />
                     </items>
                </Menu>
@@ -24,17 +24,61 @@
        </MenuBar>
        <!--// MENU BAR END //-->
        
-      <!--// SPLIT PANE START //--> 
-      <SplitPane id="HorizontalSplitView" dividerPositions="0.3" VBox.vgrow="ALWAYS" style="-fx-border-color: #fff; -fx-border-width: 10;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <items>
-            <TreeView fx:id="treeView" />
-            <SplitPane id="VerticalSplitView" dividerPositions="0.4" orientation="VERTICAL">
-               <items>
-                  <Pane id="ListView"       style="-fx-background-color: #f90;" />
-                  <Pane id="ContentView"    style="-fx-background-color: #9f0;" />
-               </items>
-            </SplitPane>
-         </items>
-      </SplitPane>
+      <!--// BIG SPLIT PANE START //--> 
+      <AnchorPane VBox.vgrow="ALWAYS">
+          <children>
+          <SplitPane id="HorizontalSplitView" dividerPositions="0.3" style="-fx-border-color: #fff; -fx-border-width: 10;" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
+            <items>
+                
+               <!--// TREE VIEW START //--> 
+               <AnchorPane>
+                   <children>
+                      <TreeView fx:id="treeView" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0" />
+                   </children>
+               </AnchorPane>
+               <!--// TREE VIEW END //-->
+               
+               <!--// RIGHT SPLIT PANE START //-->
+               <AnchorPane>
+                  <children>
+                      <SplitPane id="VerticalSplitView" dividerPositions="0.4" orientation="VERTICAL" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
+                         <items>
+                             
+                              <!--// RIGHT UPPER TABLE VIEW START //--> 
+                              <AnchorPane>
+                                <children>
+                                     <TableView fx:id="tableView" editable="true" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
+                                       <columns>
+                                         <TableColumn id="Importance" text="Importance" />
+                                         <TableColumn id="Received" text="Received" />
+                                         <TableColumn id="Read" text="Read" />
+                                         <TableColumn id="Sender" text="Sender" />
+                                         <TableColumn id="Recipients" text="Recipients" />
+                                         <TableColumn id="Subject" text="Subject" />
+                                       </columns>
+                                     </TableView>
+                                </children>
+                              </AnchorPane>
+                              <!--// RIGHT UPPER TABLE VIEW END //-->
+                              
+                              <!--// RIGHT BOTTOM PANE END //-->
+                              <AnchorPane>
+                                 <children>
+                                     <Pane id="ContentView" style="-fx-background-color: #9f0;" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0" />
+                                 </children>
+                              </AnchorPane>
+                              <!--// RIGHT BOTTOM PANE END //-->
+                         </items>
+                      </SplitPane>
+                  </children>
+               </AnchorPane>
+               <!--// RIGHT SPLIT PANE END //-->
+               
+            </items>
+         </SplitPane>
+          </children>
+      </AnchorPane>
+      <!--// BIG SPLIT PANE END //-->
+       
    </children>
 </VBox>

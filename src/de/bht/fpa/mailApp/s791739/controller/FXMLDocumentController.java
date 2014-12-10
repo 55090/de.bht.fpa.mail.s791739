@@ -5,6 +5,7 @@ import de.bht.fpa.mailApp.s791739.model.applicationLogic.FileManager;
 import de.bht.fpa.mailApp.s791739.model.applicationLogic.FolderManagerIF;
 import de.bht.fpa.mailApp.s791739.model.applicationLogic.MailManager;
 import de.bht.fpa.mailApp.s791739.model.data.Component;
+import de.bht.fpa.mailApp.s791739.model.data.Email;
 import de.bht.fpa.mailApp.s791739.model.data.FileElement;
 import de.bht.fpa.mailApp.s791739.model.data.Folder;
 import java.io.File;
@@ -15,6 +16,7 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -22,9 +24,12 @@ import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeItem.TreeModificationEvent;
 import javafx.scene.control.TreeView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
@@ -57,17 +62,17 @@ public class FXMLDocumentController implements Initializable {
     /**
      * String of root path
      */
-    private final String S_DEFAULT_ROOTPATH = "C:/Users/Me/Desktop/Account";
+    private final static String S_DEFAULT_ROOTPATH = "C:/Users/Me/Desktop/Account";
     
     /**
      * File for initial path
      */
-    private final File DEFAULT_ROOTPATH     = new File( S_DEFAULT_ROOTPATH );
+    private final static File DEFAULT_ROOTPATH     = new File( S_DEFAULT_ROOTPATH );
     
     /**
      * Dummy Element to show arrow of branch expander
      */
-    private final TreeItem<Component> DUMMY = new TreeItem<> ( new Folder(new File( "" ), true ) );
+    private final static TreeItem<Component> DUMMY = new TreeItem<> ( new Folder(new File( "" ), true ) );
     
     /**
      * FolderManager
@@ -95,6 +100,12 @@ public class FXMLDocumentController implements Initializable {
      */
     @FXML
     MenuBar menuBar;
+    
+    /**
+     * injection from FXMLDocument GUI
+     */
+    @FXML
+    TableView tableView;
 
     /**
      * Constructor
@@ -114,6 +125,7 @@ public class FXMLDocumentController implements Initializable {
     public void initialize( final URL location, final ResourceBundle resources ) {
         configureTree();
         configureMenue();
+        configureTableView();
     }   
     
     /**
@@ -133,6 +145,33 @@ public class FXMLDocumentController implements Initializable {
                 items.setOnAction( ( event )-> handleMenueEvent( event ) );
             });
         });
+    }
+    
+    private void configureTableView(){
+        for (Object tc : tableView.getColumns()){
+            TableColumn tcol = (TableColumn) tc;
+            switch (tcol.getId()){
+                case "Importance": tcol.setCellValueFactory(new PropertyValueFactory<>("importance"));
+                    System.out.println("Importance");
+                    break;
+                case "Received": tcol.setCellValueFactory(new PropertyValueFactory<>("received"));
+                    System.out.println("Received");
+                    break;
+                case "Read": tcol.setCellValueFactory(new PropertyValueFactory<>("read"));
+                    System.out.println("Read");
+                    break;
+                case "Sender": tcol.setCellValueFactory(new PropertyValueFactory<>("sender"));
+                    System.out.println("Sender");
+                    break;
+                case "Recipients": tcol.setCellValueFactory(new PropertyValueFactory<>("recipients"));
+                    System.out.println("Recipients");
+                    break;
+                case "Subject": tcol.setCellValueFactory(new PropertyValueFactory<>("subject"));
+                    System.out.println("Subject");
+                    break;
+                default:break;
+            }
+        }
     }
     
     /**
@@ -214,7 +253,13 @@ public class FXMLDocumentController implements Initializable {
      */
     private void handleEmailEvent( final TreeItem<Component> node ) {
         if ( node != null ) {
-            mailManager.printMails( mailManager.loadMails( (Folder) node.getValue() ) );
+            mailManager.loadMails( (Folder) node.getValue() );
+            //mailManager.printMails( (Folder) node.getValue() );
+            ObservableList<Email> ol = mailManager.listMails((Folder) node.getValue());
+            if (ol!=null){
+                tableView.setItems(ol);
+                
+            }
         }
     }
    
