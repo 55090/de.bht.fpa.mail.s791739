@@ -163,7 +163,7 @@ public class FXMLDocumentController implements Initializable {
                 case "Sender": tcol.setCellValueFactory(new PropertyValueFactory<>("sender"));
                     System.out.println("Sender");
                     break;
-                case "Recipients": tcol.setCellValueFactory(new PropertyValueFactory<>("recipients"));
+                case "Recipients": tcol.setCellValueFactory(new PropertyValueFactory<>("receiver"));
                     System.out.println("Recipients");
                     break;
                 case "Subject": tcol.setCellValueFactory(new PropertyValueFactory<>("subject"));
