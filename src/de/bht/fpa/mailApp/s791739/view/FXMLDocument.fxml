@@ -1,35 +1,3 @@
-<<<<<<< HEAD
-<?xml version="1.0" encoding="UTF-8"?>
-
-<?import javafx.geometry.*?>
-<?import javafx.scene.effect.*?>
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-
-<VBox id="AnchorView" prefHeight="600.0" prefWidth="900.0" style="-fx-background-color: #000;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.bht.fpa.mailApp.s791739.controller.FXMLDocumentController">
-   <children>
-      <!--// SPLIT PANE START (PARENT) //--> 
-      <SplitPane id="HorizontalSplitView" dividerPositions="0.3" VBox.vgrow="ALWAYS" style="-fx-border-color: #fff; -fx-border-width: 10;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <items>
-            <!-- TREE VIEW __ FILE SYSTEM VIEWER //-->
-            <TreeView fx:id="treeView" />
-            <!--// SPLIT PANE START (CHILD) //-->
-            <SplitPane id="VerticalSplitView" dividerPositions="0.4" orientation="VERTICAL">
-               <items>
-                  <Pane id="ListView" style="-fx-background-color: #f90;" />
-                  <Pane id="ContentView" style="-fx-background-color: #9f0;" />
-               </items>
-            </SplitPane>
-            <!--// SPLIT PANE END (CHILD) //-->
-         </items>
-      </SplitPane>
-      <!--// SPLIT PANE END (PARENT) //-->
-   </children>
-</VBox>
-=======
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.*?>
@@ -48,26 +16,88 @@
                <Menu text="Account" />
                <Menu text="File">
                     <items>
-                        <MenuItem id="fileOpen"    text="Open" />
-                        <MenuItem id="fileHistory" text="History" />
+                        <MenuItem id="fileOpen"     text="Open"    />
+                        <MenuItem id="fileHistory"  text="History" />
                     </items>
                </Menu>
            </menus>
        </MenuBar>
        <!--// MENU BAR END //-->
        
-      <!--// SPLIT PANE START //--> 
-      <SplitPane id="HorizontalSplitView" dividerPositions="0.3" VBox.vgrow="ALWAYS" style="-fx-border-color: #fff; -fx-border-width: 10;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <items>
-            <TreeView fx:id="treeView" />
-            <SplitPane id="VerticalSplitView" dividerPositions="0.4" orientation="VERTICAL">
-               <items>
-                  <Pane id="ListView"       style="-fx-background-color: #f90;" />
-                  <Pane id="ContentView"    style="-fx-background-color: #9f0;" />
-               </items>
-            </SplitPane>
-         </items>
-      </SplitPane>
+      <!--// BIG SPLIT PANE START //--> 
+      <AnchorPane VBox.vgrow="ALWAYS">
+          <children>
+          <SplitPane id="HorizontalSplitView" orientation="HORIZONTAL" dividerPositions="0.3" style="-fx-border-color: #fff; -fx-border-width: 10;" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
+            <items>
+                
+               <!--// TREE VIEW START //--> 
+               <AnchorPane>
+                   <children>
+                      <TreeView fx:id="treeView" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0" />
+                   </children>
+               </AnchorPane>
+               <!--// TREE VIEW END //-->
+               
+               <!--// RIGHT SPLIT PANE START //-->
+               <AnchorPane>
+                  <children>
+                      <SplitPane id="VerticalSplitView" dividerPositions="0.5" orientation="VERTICAL" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
+                         <items>
+                              
+                              <!--// RIGHT TOP PANE START //-->
+                              <AnchorPane>
+                                <children>
+                                    <SplitPane id="RightHorizontalSplitView" orientation="VERTICAL" dividerPositions="0.2" style="-fx-border-color: #fff; -fx-border-width: 0;" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
+                                        <items>
+                                            <!--// RIGHT UPPER SEARCH FIELD START //-->
+                                            <AnchorPane>
+                                              <children>
+                                                  <Label        id="Label_Search"     layoutX="20.0" layoutY="15.0" text="Search:" />
+                                                  <Label     fx:id="label_ItemCount"  layoutX="565"  layoutY="15.0" text=""        />
+                                                  <TextField fx:id="textField_Search" layoutX="65.0" layoutY="12.0" prefWidth="480" maxWidth="480" />
+                                              </children>
+                                            </AnchorPane>
+                                            <!--// RIGHT UPPER SEARCH FIELD START //-->
+                                            <!--// RIGHT UPPER TABLE VIEW START //--> 
+                                            <AnchorPane>
+                                              <children>
+                                                   <TableView fx:id="tableView" editable="true" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
+                                                     <columns>
+                                                       <TableColumn fx:id="importance" id="Importance" text="Importance"   prefWidth="75"  />
+                                                       <TableColumn fx:id="received"   id="Received"   text="Received"     prefWidth="110" />
+                                                       <TableColumn fx:id="read"       id="Read"       text="Read"                         />
+                                                       <TableColumn fx:id="sender"     id="Sender"     text="Sender"       prefWidth="110" />
+                                                       <TableColumn fx:id="recipients" id="Recipients" text="Recipients"   prefWidth="110" />
+                                                       <TableColumn fx:id="subject"    id="Subject"    text="Subject"      prefWidth="150" />
+                                                     </columns>
+                                                   </TableView>
+                                              </children>
+                                            </AnchorPane>
+                                            <!--// RIGHT UPPER TABLE VIEW END //-->
+                                        </items>
+                                    </SplitPane>
+                                </children>
+                              </AnchorPane>
+                              <!--// RIGHT TOP PANE END //-->
+                              
+                              <!--// RIGHT BOTTOM PANE START //-->
+                              <AnchorPane>
+                                 <children>
+                                     <Pane id="ContentView" style="-fx-background-color: #9f0;" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0" />
+                                 </children>
+                              </AnchorPane>
+                              <!--// RIGHT BOTTOM PANE END //-->
+                         </items>
+                      </SplitPane>
+                  </children>
+               </AnchorPane>
+               <!--// RIGHT SPLIT PANE END //-->
+               
+            </items>
+         </SplitPane>
+          </children>
+      </AnchorPane>
+      <!--// BIG SPLIT PANE END //-->
+       
    </children>
 </VBox>
->>>>>>> 40db066346da37007cc14cb546f6f3ac75c1b667

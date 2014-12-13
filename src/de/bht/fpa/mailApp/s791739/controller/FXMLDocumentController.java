@@ -5,28 +5,38 @@ import de.bht.fpa.mailApp.s791739.model.applicationLogic.FileManager;
 import de.bht.fpa.mailApp.s791739.model.applicationLogic.FolderManagerIF;
 import de.bht.fpa.mailApp.s791739.model.applicationLogic.MailManager;
 import de.bht.fpa.mailApp.s791739.model.data.Component;
+import de.bht.fpa.mailApp.s791739.model.data.Email;
 import de.bht.fpa.mailApp.s791739.model.data.FileElement;
 import de.bht.fpa.mailApp.s791739.model.data.Folder;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.TreeSet;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeItem.TreeModificationEvent;
 import javafx.scene.control.TreeView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
@@ -35,7 +45,7 @@ import javafx.stage.StageStyle;
 /**
  * Controller Class for FXMLDocument
  * @author Marco Kollosche, András Bucsi (FPA Strippgen)
- * @version Aufgabe 4 2014-11-25
+ * @version Aufgabe 5 2014-12-15
  */
 public class FXMLDocumentController implements Initializable {
     
@@ -57,17 +67,17 @@ public class FXMLDocumentController implements Initializable {
     /**
      * String of root path
      */
-    private final String S_DEFAULT_ROOTPATH = "C:/Users/Me/Desktop/Account";
+    private final static String S_DEFAULT_ROOTPATH = "C:/Users/Me/Desktop/Account";
     
     /**
      * File for initial path
      */
-    private final File DEFAULT_ROOTPATH     = new File( S_DEFAULT_ROOTPATH );
+    private final static File DEFAULT_ROOTPATH     = new File( S_DEFAULT_ROOTPATH );
     
     /**
      * Dummy Element to show arrow of branch expander
      */
-    private final TreeItem<Component> DUMMY = new TreeItem<> ( new Folder(new File( "" ), true ) );
+    private final static TreeItem<Component> DUMMY = new TreeItem<> ( new Folder(new File( "" ), true ) );
     
     /**
      * FolderManager
@@ -85,6 +95,16 @@ public class FXMLDocumentController implements Initializable {
     private final TreeSet<File> historySet;
     
     /**
+     * Observable List for Email-Items
+     */
+    private ObservableList<Email> observableEmailList;
+    
+    /**
+     * Saves matching Emails
+     */
+    private final ArrayList<Email> searchList;
+    
+    /**
      * injection from FXMLDocument GUI
      */
     @FXML
@@ -95,14 +115,43 @@ public class FXMLDocumentController implements Initializable {
      */
     @FXML
     MenuBar menuBar;
+    
+    /**
+     * injection from FXMLDocument GUI
+     */
+    @FXML
+    TextField textField_Search;
+   
+    /**
+     * injection from FXMLDocument GUI
+     */
+    @FXML
+    Label label_ItemCount;
+   
+    /**
+     * injection from FXMLDocument GUI
+     */
+    @FXML
+    TableView tableView;
+    
+    @FXML
+    TableColumn importance, 
+                received  , 
+                read      , 
+                sender    , 
+                recipients, 
+                subject   ;
+    
 
     /**
      * Constructor
      */
     public FXMLDocumentController(){
-        folderManager   = new FileManager( DEFAULT_ROOTPATH );
-        mailManager     = new MailManager();
-        historySet      = new TreeSet<>();
+        folderManager        = new FileManager( DEFAULT_ROOTPATH );
+        mailManager          = new MailManager();
+        historySet           = new TreeSet<>();
+        observableEmailList  = null;
+        searchList = new ArrayList();
     }
 
     /**
@@ -114,6 +163,8 @@ public class FXMLDocumentController implements Initializable {
     public void initialize( final URL location, final ResourceBundle resources ) {
         configureTree();
         configureMenue();
+        configureTableView();
+        configureSearch();
     }   
     
     /**
@@ -133,6 +184,43 @@ public class FXMLDocumentController implements Initializable {
                 items.setOnAction( ( event )-> handleMenueEvent( event ) );
             });
         });
+    }
+    /**
+     * Method configures the TableView Columns
+     */
+    private void configureTableView(){
+        importance.setCellValueFactory(new PropertyValueFactory<>("importance"));
+        received.  setCellValueFactory(new PropertyValueFactory<>("received"));
+        read.      setCellValueFactory(new PropertyValueFactory<>("read"));
+        sender.    setCellValueFactory(new PropertyValueFactory<>("sender"));
+        recipients.setCellValueFactory(new PropertyValueFactory<>("receiver"));
+        subject.   setCellValueFactory(new PropertyValueFactory<>("subject"));
+        
+//        importance.setSortType(TableColumn.SortType.DESCENDING);
+        received.  setSortType(TableColumn.SortType.ASCENDING);
+//        read.      setSortType(TableColumn.SortType.DESCENDING);
+//        sender.    setSortType(TableColumn.SortType.DESCENDING);
+//        recipients.setSortType(TableColumn.SortType.DESCENDING);
+//        subject.   setSortType(TableColumn.SortType.DESCENDING);
+    }
+    
+    /**
+     * Method adds EventHandler to search textfield
+     */
+    private void configureSearch(){
+        textField_Search.addEventHandler(KeyEvent.KEY_RELEASED, (KeyEvent e)->handleSearch(e));
+    }
+    
+    /**
+     * Methods adds sort type to specified column and performs sort
+     * @param col specified TableColumn
+     */
+    private void setColumnSort(final TableColumn col) {
+        ObservableList ol_tc = tableView.getSortOrder();
+        ol_tc.removeAll(ol_tc);
+        ol_tc.add(col);
+        col.setSortType(TableColumn.SortType.DESCENDING);
+        col.setSortable(true);
     }
     
     /**
@@ -170,7 +258,6 @@ public class FXMLDocumentController implements Initializable {
                 }  
                 break;
             case "fileHistory": showHistoryView(); 
-                
                 break;
         }
     }
@@ -214,10 +301,45 @@ public class FXMLDocumentController implements Initializable {
      */
     private void handleEmailEvent( final TreeItem<Component> node ) {
         if ( node != null ) {
-            mailManager.printMails( mailManager.loadMails( (Folder) node.getValue() ) );
+            mailManager.loadMails( (Folder) node.getValue() );
+            //mailManager.printMails( (Folder) node.getValue() );
+            observableEmailList = mailManager.listMails((Folder) node.getValue());
+            if (observableEmailList!=null){
+                tableView.setItems(observableEmailList);
+                setCurrentEmailSizeToLabel();
+            }
         }
     }
    
+    /**
+     * Method handles Events triggered by key release in search field
+     * obtains String from EventSource and matches it with the attributes of the Email-objects
+     * contained in the current ObservableList<Email> of the TableView
+     * @param e Key Event (Javafx Scene) KeyEvent.KeyReleased
+     */
+    private void handleSearch(final KeyEvent e) {
+        searchList.clear();
+        String s = ((TextField)e.getSource()).getText().toLowerCase();
+        // System.out.println("handleSearch String: "+s);
+        s = ".*"+s+".*"; // RegEx
+        for(final Email email : observableEmailList){
+            if ( email.getSubject() .toLowerCase().matches(s) || email.getText()  .toLowerCase().matches(s) 
+              || email.getReceived().toLowerCase().matches(s) || email.getSent()  .toLowerCase().matches(s) 
+              || email.getReceiver().toLowerCase().matches(s) || email.getSender().toLowerCase().matches(s) ){
+                searchList.add(email);
+            }
+        }
+        tableView.setItems(FXCollections.observableArrayList(searchList));
+        setCurrentEmailSizeToLabel();
+    }
+    
+    /**
+     * Method counts contained TableView items (Emails) and sets it to label
+     */
+    private void setCurrentEmailSizeToLabel() {
+        label_ItemCount.setText("("+tableView.getItems().size()+")");
+    }
+    
     /**
      * Method removes all children a first (including dummy elements ) and then loads all children of a TreeItem
      * @param node TreeItem
