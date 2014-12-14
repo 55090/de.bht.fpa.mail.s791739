@@ -3,7 +3,7 @@ package de.bht.fpa.mailApp.s791739.controller;
 import de.bht.fpa.mailApp.s791739.model.applicationLogic.EmailManagerIF;
 import de.bht.fpa.mailApp.s791739.model.applicationLogic.FileManager;
 import de.bht.fpa.mailApp.s791739.model.applicationLogic.FolderManagerIF;
-import de.bht.fpa.mailApp.s791739.model.applicationLogic.MailManager;
+import de.bht.fpa.mailApp.s791739.model.applicationLogic.XMLEmailManager;
 import de.bht.fpa.mailApp.s791739.model.data.Component;
 import de.bht.fpa.mailApp.s791739.model.data.Email;
 import de.bht.fpa.mailApp.s791739.model.data.FileElement;
@@ -18,7 +18,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -29,6 +28,7 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeItem.TreeModificationEvent;
@@ -45,113 +45,88 @@ import javafx.stage.StageStyle;
 /**
  * Controller Class for FXMLDocument
  * @author Marco Kollosche, András Bucsi (FPA Strippgen)
- * @version Aufgabe 5 2014-12-15
+ * @version Aufgabe 6 2014-12-15
  */
 public class FXMLDocumentController implements Initializable {
     
-    /**
-     * Image for the folder visualization
-     */
+    // Image for the folder visualization
     private final Image FOLDER_ICON      = new Image( getClass().getResourceAsStream( "/de/bht/fpa/mailApp/s791739/model/data/icons/folder_Icon.png" ) );
     
-    /**
-     * Image for the folder visualization
-     */
+    // Image for the folder visualization
     private final Image FOLDER_OPEN_ICON = new Image( getClass().getResourceAsStream( "/de/bht/fpa/mailApp/s791739/model/data/icons/folder_open_Icon.png" ) );
     
-    /**
-     * Image for the file visualization
-     */
+    // Image for the file visualization
     private final Image FILE_ICON        = new Image( getClass().getResourceAsStream( "/de/bht/fpa/mailApp/s791739/model/data/icons/file_Icon.png" ) );
     
-    /**
-     * String of root path
-     */
+    // String of root path
     private final static String S_DEFAULT_ROOTPATH = "C:/Users/Me/Desktop/Account";
     
-    /**
-     * File for initial path
-     */
+    // File for initial path
     private final static File DEFAULT_ROOTPATH     = new File( S_DEFAULT_ROOTPATH );
     
-    /**
-     * Dummy Element to show arrow of branch expander
-     */
+    // Dummy Element to show arrow of branch expander
     private final static TreeItem<Component> DUMMY = new TreeItem<> ( new Folder(new File( "" ), true ) );
     
-    /**
-     * FolderManager
-     */
+    // FolderManager
     private final FolderManagerIF folderManager;
     
-    /**
-     * E-Mail manager
-     */
+    // E-Mail manager
     private final EmailManagerIF mailManager;
     
-    /**
-     * Saves used directories
-     */
+    // Saves used directories
     private final TreeSet<File> historySet;
     
-    /**
-     * Observable List for Email-Items
-     */
-    private ObservableList<Email> observableEmailList;
+    // Observable List for Email-Items
+    private ArrayList<Email> emailList;
     
-    /**
-     * Saves matching Emails
-     */
+    // Saves matching Emails
     private final ArrayList<Email> searchList;
     
-    /**
-     * injection from FXMLDocument GUI
-     */
-    @FXML
-    TreeView treeView;
     
     /**
-     * injection from FXMLDocument GUI
+     * injections from FXMLDocument GUI
      */
+    @FXML
+    TreeView<Component> treeView;
+    
     @FXML
     MenuBar menuBar;
-    
-    /**
-     * injection from FXMLDocument GUI
-     */
+
     @FXML
     TextField textField_Search;
-   
-    /**
-     * injection from FXMLDocument GUI
-     */
+
     @FXML
     Label label_ItemCount;
-   
-    /**
-     * injection from FXMLDocument GUI
-     */
+
     @FXML
-    TableView tableView;
-    
+    TableView<Email> tableView;
+
     @FXML
-    TableColumn importance, 
-                received  , 
-                read      , 
-                sender    , 
-                recipients, 
-                subject   ;
-    
+    TableColumn<Email, String> importance, 
+                               received  , 
+                               read      , 
+                               sender    , 
+                               recipients, 
+                               subject   ;
+
+    @FXML
+    Label l_sender_placeholder  , 
+          l_subject_placeholder ,
+          l_received_placeholder,
+          l_receiver_placeholder;
+
+    @FXML
+    TextArea tA_mailBody;
 
     /**
      * Constructor
      */
     public FXMLDocumentController(){
-        folderManager        = new FileManager( DEFAULT_ROOTPATH );
-        mailManager          = new MailManager();
-        historySet           = new TreeSet<>();
-        observableEmailList  = null;
-        searchList = new ArrayList();
+        folderManager = new FileManager( DEFAULT_ROOTPATH );
+        mailManager   = new XMLEmailManager();
+        historySet    = new TreeSet<>();
+        emailList     = null;
+        searchList    = new ArrayList();
     }
 
     /**
@@ -172,7 +147,9 @@ public class FXMLDocumentController implements Initializable {
      */
     private void configureTree(){
         setTreeRoot( DEFAULT_ROOTPATH );
-        treeView.getSelectionModel().selectedItemProperty().addListener( ( ObservableValue observable, Object oldValue, Object newValue ) -> handleEmailEvent( (TreeItem<Component>) newValue ) );
+        treeView.getSelectionModel().selectedItemProperty().addListener( ( ObservableValue<? extends TreeItem<Component>> observable, TreeItem<Component> oldValue, TreeItem<Component> newValue ) -> handleEmailEvent(newValue) );
+        treeView.getSelectionModel().selectedItemProperty().addListener( ( ObservableValue<? extends TreeItem<Component>> observable, TreeItem<Component> oldValue, TreeItem<Component> newValue ) -> clearContentView());
+        treeView.getSelectionModel().selectedItemProperty().addListener( ( ObservableValue<? extends TreeItem<Component>> observable, TreeItem<Component> oldValue, TreeItem<Component> newValue ) -> TreeModificationEvent.fireEvent(treeView, new Event(TreeItem.treeNotificationEvent())));
     }
     
     /**
@@ -197,12 +174,12 @@ public class FXMLDocumentController implements Initializable {
         subject.   setCellValueFactory(new PropertyValueFactory<>("subject"));
         
 //        importance.setSortType(TableColumn.SortType.DESCENDING);
-        received.  setSortType(TableColumn.SortType.ASCENDING);
+        received.  setSortType(TableColumn.SortType.DESCENDING);
 //        read.      setSortType(TableColumn.SortType.DESCENDING);
 //        sender.    setSortType(TableColumn.SortType.DESCENDING);
 //        recipients.setSortType(TableColumn.SortType.DESCENDING);
 //        subject.   setSortType(TableColumn.SortType.DESCENDING);
-        tableView.getSelectionModel().selectedItemProperty().addListener( ( ObservableValue observable, Object oldValue, Object newValue ) -> handleTableViewSelection(newValue));
+          tableView.getSelectionModel().selectedItemProperty().addListener((ObservableValue<? extends Email> observableVal, Email oldVal, Email newVal) -> handleTableViewSelection(newVal));
     }
     
     /**
@@ -210,18 +187,6 @@ public class FXMLDocumentController implements Initializable {
      */
     private void configureSearch(){
         textField_Search.addEventHandler(KeyEvent.KEY_RELEASED, (KeyEvent e)->handleSearch(e));
-    }
-    
-    /**
-     * Methods adds sort type to specified column and performs sort
-     * @param col specified TableColumn
-     */
-    private void setColumnSort(final TableColumn col) {
-        ObservableList ol_tc = tableView.getSortOrder();
-        ol_tc.removeAll(ol_tc);
-        ol_tc.add(col);
-        col.setSortType(TableColumn.SortType.DESCENDING);
-        col.setSortable(true);
     }
     
     /**
@@ -236,6 +201,7 @@ public class FXMLDocumentController implements Initializable {
         
         rootItem.addEventHandler( TreeItem.branchExpandedEvent(),  ( TreeItem.TreeModificationEvent <Component> e ) -> handleExpandEvent( e ) );
         rootItem.addEventHandler( TreeItem.branchCollapsedEvent(), ( TreeItem.TreeModificationEvent <Component> e ) -> handleCollapseEvent( e ) );
+        rootItem.addEventHandler( TreeItem.treeNotificationEvent(), (TreeItem.TreeModificationEvent<Component> e ) ->  addNumberToTreeItem( (TreeItem)e.getTreeItem() ));
         
 	treeView.setRoot( rootItem );
 	loadTreeItemContents( rootItem );
@@ -287,9 +253,6 @@ public class FXMLDocumentController implements Initializable {
      * @param e TreeModificationEvent when expanded branch has been clicked to collapse
      */
     private void handleCollapseEvent( final TreeModificationEvent <Component> e ){
-        /**
-         * node to reference the treeItem contained in the TreeModificationEvent
-         */
         TreeItem node = e.getTreeItem();
         e.getTreeItem().setGraphic( new ImageView( FOLDER_ICON ) );
         node.getChildren().removeAll( node.getChildren() );
@@ -302,20 +265,28 @@ public class FXMLDocumentController implements Initializable {
      */
     private void handleEmailEvent( final TreeItem<Component> node ) {
         if ( node != null ) {
-            mailManager.loadMails( (Folder) node.getValue() );
+            mailManager.loadEmails( (Folder) node.getValue() );
             //mailManager.printMails( (Folder) node.getValue() );
-            observableEmailList = mailManager.listMails((Folder) node.getValue());
-            if (observableEmailList!=null){
-                tableView.setItems(observableEmailList);
+            emailList = (ArrayList)((Folder) node.getValue()).getEmails();
+            if (emailList!=null){
+                tableView.setItems(FXCollections.observableArrayList(emailList));
                 setCurrentEmailSizeToLabel();
-                Folder f = (Folder) node.getValue();
-                if (f.getName().matches(".*\\s*[(\\d*)].*")){
-                    f.setName(f.getName().replace(".*\\s*[(\\d*)].*", "("+f.getEmails().size()));
-                } else {
-                    
-                    f.setName(node.getValue().toString()+" ("+f.getEmails().size()+")");
-                }
-                node.setValue(f);
+            }
+        }
+    }
+    
+    /**
+     * Method adds number of contained E-Mails to TreeItem (Folder)
+     * @param treeItem current (focussed) TreeItem
+     */
+    private void addNumberToTreeItem(final TreeItem<Component> treeItem) {
+        if (treeItem!=null){
+            String s = treeItem.getValue().getName();
+            treeItem.getValue().setName(null);
+            if(s.matches(".*\\s*[(\\d*)].*")){
+                treeItem.getValue().setName(s.replace(".*\\s*[(\\d*)].*", " ("+((Folder)treeItem.getValue()).getEmails().size()));
+            } else {
+                treeItem.getValue().setName(s+" ("+((Folder)treeItem.getValue()).getEmails().size()+")");
             }
         }
     }
@@ -329,9 +300,8 @@ public class FXMLDocumentController implements Initializable {
     private void handleSearch(final KeyEvent e) {
         searchList.clear();
         String s = ((TextField)e.getSource()).getText().toLowerCase();
-        // System.out.println("handleSearch String: "+s);
         s = ".*"+s+".*"; // RegEx
-        for(final Email email : observableEmailList){
+        for(final Email email : emailList){
             if ( email.getSubject() .toLowerCase().matches(s) || email.getText()  .toLowerCase().matches(s) 
               || email.getReceived().toLowerCase().matches(s) || email.getSent()  .toLowerCase().matches(s) 
               || email.getReceiver().toLowerCase().matches(s) || email.getSender().toLowerCase().matches(s) ){
@@ -353,8 +323,26 @@ public class FXMLDocumentController implements Initializable {
      * Method shows Emails in a content window when a specific list item was selected 
      * @param newValue 
      */
-    private void handleTableViewSelection( final Object newValue ) {
-        // add body
+    private void handleTableViewSelection( final Email mailItem ) {
+        if(mailItem!=null){
+            l_sender_placeholder  .setText(mailItem.getSender());
+            l_subject_placeholder .setText(mailItem.getSubject());
+            l_received_placeholder.setText(mailItem.getReceived());
+            l_receiver_placeholder.setText(mailItem.getReceiver());
+            tA_mailBody           .setText(mailItem.getText());
+        }
+    }
+    
+    /**
+     * Method clears all fields of the eMail content view by setting them with an empty String or "(no item selected)"
+     */
+    private void clearContentView(){
+        l_sender_placeholder  .setText("");
+        l_subject_placeholder .setText("");
+        l_received_placeholder.setText("");
+        l_receiver_placeholder.setText("");
+        tA_mailBody           .setText("(no item selected)");
+        
     }
     
     /**

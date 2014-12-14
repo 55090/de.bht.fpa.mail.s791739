@@ -1,6 +1,5 @@
 package de.bht.fpa.mailApp.s791739.model.applicationLogic;
 
-import de.bht.fpa.mailApp.s791739.model.data.FileElement;
 import de.bht.fpa.mailApp.s791739.model.data.Folder;
 import java.io.File;
 
@@ -9,7 +8,7 @@ import java.io.File;
  * @author Marco Kollosche, András Bucsi (FPA Strippgen)
  * @version Aufgabe 3 2014-11-13
  */
-public class FileManager implements FolderManagerIF {
+public class EmailFolderManager implements FolderManagerIF {
 
     //top Folder of the managed hierarchy
     protected Folder topFolder;
@@ -20,7 +19,7 @@ public class FileManager implements FolderManagerIF {
      * The contents of the  directory file are loaded into the top folder
      * @param file File which points to the top directory
      */
-    public FileManager( final File file ) {
+    public EmailFolderManager( final File file ) {
        topFolder = new Folder( file, true );
     }
     
