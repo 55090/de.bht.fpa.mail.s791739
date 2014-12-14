@@ -59,7 +59,6 @@ public class MailManager implements EmailManagerIF {
      */
     @Override
     public ObservableList<Email> listMails( final Folder folder) {
-        System.out.println("list A");
         ObservableList<Email> ol = FXCollections.observableArrayList();
         final List<Email> mails = folder.getEmails();
         mails.stream().forEach( ( final Email email_item ) -> { ol.add(email_item); });

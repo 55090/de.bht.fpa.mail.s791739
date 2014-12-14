@@ -172,7 +172,7 @@ public class FXMLDocumentController implements Initializable {
      */
     private void configureTree(){
         setTreeRoot( DEFAULT_ROOTPATH );
-        treeView.getFocusModel().focusedItemProperty().addListener( ( ObservableValue observable, Object oldValue, Object newValue ) -> handleEmailEvent( (TreeItem<Component>) newValue ) );
+        treeView.getSelectionModel().selectedItemProperty().addListener( ( ObservableValue observable, Object oldValue, Object newValue ) -> handleEmailEvent( (TreeItem<Component>) newValue ) );
     }
     
     /**
@@ -202,6 +202,7 @@ public class FXMLDocumentController implements Initializable {
 //        sender.    setSortType(TableColumn.SortType.DESCENDING);
 //        recipients.setSortType(TableColumn.SortType.DESCENDING);
 //        subject.   setSortType(TableColumn.SortType.DESCENDING);
+        tableView.getSelectionModel().selectedItemProperty().addListener( ( ObservableValue observable, Object oldValue, Object newValue ) -> handleTableViewSelection(newValue));
     }
     
     /**
@@ -307,6 +308,14 @@ public class FXMLDocumentController implements Initializable {
             if (observableEmailList!=null){
                 tableView.setItems(observableEmailList);
                 setCurrentEmailSizeToLabel();
+                Folder f = (Folder) node.getValue();
+                if (f.getName().matches(".*\\s*[(\\d*)].*")){
+                    f.setName(f.getName().replace(".*\\s*[(\\d*)].*", "("+f.getEmails().size()));
+                } else {
+                    
+                    f.setName(node.getValue().toString()+" ("+f.getEmails().size()+")");
+                }
+                node.setValue(f);
             }
         }
     }
@@ -338,6 +347,14 @@ public class FXMLDocumentController implements Initializable {
      */
     private void setCurrentEmailSizeToLabel() {
         label_ItemCount.setText("("+tableView.getItems().size()+")");
+    }
+    
+    /**
+     * Method shows Emails in a content window when a specific list item was selected 
+     * @param newValue 
+     */
+    private void handleTableViewSelection( final Object newValue ) {
+        // add body
     }
     
     /**
