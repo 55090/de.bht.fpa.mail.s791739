@@ -149,7 +149,9 @@ public class FXMLDocumentController implements Initializable {
         setTreeRoot( DEFAULT_ROOTPATH );
         treeView.getSelectionModel().selectedItemProperty().addListener( ( ObservableValue<? extends TreeItem<Component>> observable, TreeItem<Component> oldValue, TreeItem<Component> newValue ) -> handleEmailEvent(newValue) );
         treeView.getSelectionModel().selectedItemProperty().addListener( ( ObservableValue<? extends TreeItem<Component>> observable, TreeItem<Component> oldValue, TreeItem<Component> newValue ) -> clearContentView());
-        treeView.getSelectionModel().selectedItemProperty().addListener( ( ObservableValue<? extends TreeItem<Component>> observable, TreeItem<Component> oldValue, TreeItem<Component> newValue ) -> TreeModificationEvent.fireEvent(treeView, new Event(TreeItem.treeNotificationEvent())));
+        treeView.getSelectionModel().selectedItemProperty().addListener( ( ObservableValue<? extends TreeItem<Component>> observable, TreeItem<Component> oldValue, TreeItem<Component> newValue ) -> addNumberToTreeItem( newValue ));
+        
+        //treeView.getSelectionModel().selectedItemProperty().addListener( ( ObservableValue<? extends TreeItem<Component>> observable, TreeItem<Component> oldValue, TreeItem<Component> newValue ) -> TreeModificationEvent.fireEvent(treeView, new Event(TreeItem.treeNotificationEvent())));
     }
     
     /**
@@ -201,7 +203,7 @@ public class FXMLDocumentController implements Initializable {
         
         rootItem.addEventHandler( TreeItem.branchExpandedEvent(),  ( TreeItem.TreeModificationEvent <Component> e ) -> handleExpandEvent( e ) );
         rootItem.addEventHandler( TreeItem.branchCollapsedEvent(), ( TreeItem.TreeModificationEvent <Component> e ) -> handleCollapseEvent( e ) );
-        rootItem.addEventHandler( TreeItem.treeNotificationEvent(), (TreeItem.TreeModificationEvent<Component> e ) ->  addNumberToTreeItem( (TreeItem)e.getTreeItem() ));
+        //rootItem.addEventHandler( TreeItem.treeNotificationEvent(), (TreeItem.TreeModificationEvent<Component> e ) ->  addNumberToTreeItem( (TreeItem)e.getTreeItem() ));
         
 	treeView.setRoot( rootItem );
 	loadTreeItemContents( rootItem );
@@ -287,6 +289,15 @@ public class FXMLDocumentController implements Initializable {
                 treeItem.getValue().setName(s.replace(".*\\s*[(\\d*)].*", " ("+((Folder)treeItem.getValue()).getEmails().size()));
             } else {
                 treeItem.getValue().setName(s+" ("+((Folder)treeItem.getValue()).getEmails().size()+")");
+            }
+            /**
+             * this is used to trigger a TreeModifictionEvent, 
+             * thus the Tree "refreshes" with the new names.
+             */
+            if(((ImageView)treeItem.getGraphic()).getImage()==FOLDER_ICON){
+                treeItem.setGraphic(new ImageView( FOLDER_ICON ));
+            } else {
+                treeItem.setGraphic(new ImageView( FOLDER_OPEN_ICON ));
             }
         }
     }
