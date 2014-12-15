@@ -1,8 +1,10 @@
 package de.bht.fpa.mailApp.s791739.controller;
 
-import de.bht.fpa.mailApp.s791739.model.applicationLogic.EmailManagerIF;
+import de.bht.fpa.mailApp.s791739.model.ApplicationLogicIF;
+import de.bht.fpa.mailApp.s791739.model.EmailManagerIF;
 import de.bht.fpa.mailApp.s791739.model.applicationLogic.FileManager;
-import de.bht.fpa.mailApp.s791739.model.applicationLogic.FolderManagerIF;
+import de.bht.fpa.mailApp.s791739.model.FolderManagerIF;
+import de.bht.fpa.mailApp.s791739.model.applicationLogic.ApplicationLogic;
 import de.bht.fpa.mailApp.s791739.model.applicationLogic.XMLEmailManager;
 import de.bht.fpa.mailApp.s791739.model.data.Component;
 import de.bht.fpa.mailApp.s791739.model.data.Email;
@@ -18,12 +20,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
@@ -68,20 +72,16 @@ public class FXMLDocumentController implements Initializable {
     private final static TreeItem<Component> DUMMY = new TreeItem<> ( new Folder(new File( "" ), true ) );
     
     // FolderManager
-    private final FolderManagerIF folderManager;
+    //private final FolderManagerIF folderManager;
     
     // E-Mail manager
-    private final EmailManagerIF mailManager;
+    //private final EmailManagerIF mailManager;
+    
+    // ApplicationLogic
+    private final ApplicationLogic appLogic;
     
     // Saves used directories
     private final TreeSet<File> historySet;
-    
-    // Observable List for Email-Items
-    private ArrayList<Email> emailList;
-    
-    // Saves matching Emails
-    private final ArrayList<Email> searchList;
-    
     
     /**
      * injections from FXMLDocument GUI
@@ -91,6 +91,11 @@ public class FXMLDocumentController implements Initializable {
     
     @FXML
     MenuBar menuBar;
+    
+    @FXML
+    MenuItem fileOpen   , 
+             save       , 
+             fileHistory;
 
     @FXML
     TextField textField_Search;
@@ -122,11 +127,10 @@ public class FXMLDocumentController implements Initializable {
      * Constructor
      */
     public FXMLDocumentController(){
-        folderManager = new FileManager( DEFAULT_ROOTPATH );
-        mailManager   = new XMLEmailManager();
+        //folderManager = new FileManager( DEFAULT_ROOTPATH );
+        //mailManager   = new XMLEmailManager();
+        appLogic      = new ApplicationLogic(DEFAULT_ROOTPATH);
         historySet    = new TreeSet<>();
-        emailList     = null;
-        searchList    = new ArrayList();
     }
 
     /**
@@ -158,11 +162,10 @@ public class FXMLDocumentController implements Initializable {
      * Method configures the Menu Items with event handler
      */
     private void configureMenue(){
-        menuBar.getMenus().stream().forEach( ( menu )-> { 
-            menu.getItems().stream().forEach( ( items )-> {
-                items.setOnAction( ( event )-> handleMenueEvent( event ) );
-            });
-        });
+        fileOpen   .setOnAction( ( event )-> handleMenueEvent( event ) );
+        save       .setOnAction( ( event )-> handleMenueEvent( event ) );
+        fileHistory.setOnAction( ( event )-> handleMenueEvent( event ) );
+        save.setDisable(true);
     }
     /**
      * Method configures the TableView Columns
@@ -196,14 +199,13 @@ public class FXMLDocumentController implements Initializable {
      * @param rootPath given File to set as root for tree
      */
     protected void setTreeRoot( final File rootPath ){
-	folderManager.setTopFolder( rootPath );
+	appLogic.changeDirectory(rootPath );
         
-        TreeItem<Component> rootItem = new TreeItem<> ( folderManager.getTopFolder(), new ImageView( FOLDER_OPEN_ICON ) ); 
+        TreeItem<Component> rootItem = new TreeItem<> ( appLogic.getTopFolder(), new ImageView( FOLDER_OPEN_ICON ) ); 
 	rootItem.setExpanded( true );
         
         rootItem.addEventHandler( TreeItem.branchExpandedEvent(),  ( TreeItem.TreeModificationEvent <Component> e ) -> handleExpandEvent( e ) );
         rootItem.addEventHandler( TreeItem.branchCollapsedEvent(), ( TreeItem.TreeModificationEvent <Component> e ) -> handleCollapseEvent( e ) );
-        //rootItem.addEventHandler( TreeItem.treeNotificationEvent(), (TreeItem.TreeModificationEvent<Component> e ) ->  addNumberToTreeItem( (TreeItem)e.getTreeItem() ));
         
 	treeView.setRoot( rootItem );
 	loadTreeItemContents( rootItem );
@@ -214,26 +216,39 @@ public class FXMLDocumentController implements Initializable {
      * @param e event source
      */
     private void handleMenueEvent( final Event e ){
+        File path;
         switch( ( (MenuItem)e.getSource() ).getId() ){
-            case "fileOpen":
-                File openNewRoot = openDirectoryChooser(); 
-                if ( openNewRoot == null ){
+            case "FileOpen":
+                path = openDirectoryChooser(); 
+                if ( path == null ){
+                    System.err.println("No directory chosen!");    
                     break;
                 } else{
-                    setTreeRoot( openNewRoot );
-                    if ( openNewRoot != DEFAULT_ROOTPATH ){
-                        historySet.add( openNewRoot );
+                    setTreeRoot( path );
+                    if ( path != DEFAULT_ROOTPATH ){
+                        historySet.add( path );
                     }
                 }  
                 break;
-            case "fileHistory": showHistoryView(); 
+            case "Save": 
+                path = openDirectoryChooser(); 
+                if ( path == null ){
+                    System.err.println("No directory chosen!");    
+                    break;
+                } else{
+                    appLogic.saveEmails(path);
+                }  
+                break;
+            case "FileHistory": showHistoryView(); 
+                break;
+            default:
                 break;
         }
     }
     
     /**
-     * Method opens a Window to chose a base directory
-     * @returns a File with the new chosen base directory (or null if no choice)
+     * Method opens a Window to chose directory
+     * @returns a File with the new chosen directory (or null if no choice)
      */
     private File openDirectoryChooser(){
         DirectoryChooser dc = new DirectoryChooser();
@@ -267,12 +282,13 @@ public class FXMLDocumentController implements Initializable {
      */
     private void handleEmailEvent( final TreeItem<Component> node ) {
         if ( node != null ) {
-            mailManager.loadEmails( (Folder) node.getValue() );
-            //mailManager.printMails( (Folder) node.getValue() );
-            emailList = (ArrayList)((Folder) node.getValue()).getEmails();
-            if (emailList!=null){
-                tableView.setItems(FXCollections.observableArrayList(emailList));
+            appLogic.loadEmails( (Folder) node.getValue() );
+            appLogic.updateEmailList((Folder) node.getValue());
+            ObservableList<Email> eList = appLogic.getEmailList();
+            if (eList!=null){
+                tableView.setItems(eList);
                 setCurrentEmailSizeToLabel();
+                save.setDisable(true);
             }
         }
     }
@@ -309,17 +325,9 @@ public class FXMLDocumentController implements Initializable {
      * @param e Key Event (Javafx Scene) KeyEvent.KeyReleased
      */
     private void handleSearch(final KeyEvent e) {
-        searchList.clear();
         String s = ((TextField)e.getSource()).getText().toLowerCase();
-        s = ".*"+s+".*"; // RegEx
-        for(final Email email : emailList){
-            if ( email.getSubject() .toLowerCase().matches(s) || email.getText()  .toLowerCase().matches(s) 
-              || email.getReceived().toLowerCase().matches(s) || email.getSent()  .toLowerCase().matches(s) 
-              || email.getReceiver().toLowerCase().matches(s) || email.getSender().toLowerCase().matches(s) ){
-                searchList.add(email);
-            }
-        }
-        tableView.setItems(FXCollections.observableArrayList(searchList));
+        appLogic.updateSearchList(s);
+        tableView.setItems(appLogic.getSearchList());
         setCurrentEmailSizeToLabel();
     }
     
@@ -341,6 +349,8 @@ public class FXMLDocumentController implements Initializable {
             l_received_placeholder.setText(mailItem.getReceived());
             l_receiver_placeholder.setText(mailItem.getReceiver());
             tA_mailBody           .setText(mailItem.getText());
+            save.setDisable(false);
+            appLogic.setSelectedTableViewItem(mailItem);
         }
     }
     
@@ -353,6 +363,13 @@ public class FXMLDocumentController implements Initializable {
         l_received_placeholder.setText("");
         l_receiver_placeholder.setText("");
         tA_mailBody           .setText("(no item selected)");
+        menuBar.getMenus().stream().forEach( ( Menu menu )-> { 
+                menu.getItems().stream().forEach( ( MenuItem item )-> {
+                    if(item.getId().equals("save")){
+                        item.setDisable(true);
+                    }
+            });
+        });
         
     }
     
@@ -363,7 +380,7 @@ public class FXMLDocumentController implements Initializable {
     private void loadTreeItemContents( final TreeItem<Component> node ){
         Folder folder = (Folder)node.getValue();
         node.getChildren().remove( DUMMY );
-        folderManager.loadContent( folder );
+        appLogic.loadContent( folder );
         
         folder.getComponents().stream().forEach( ( Component subComponent ) -> {
             if( subComponent instanceof Folder ){

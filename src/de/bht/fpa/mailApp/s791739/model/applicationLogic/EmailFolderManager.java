@@ -1,12 +1,13 @@
 package de.bht.fpa.mailApp.s791739.model.applicationLogic;
 
+import de.bht.fpa.mailApp.s791739.model.FolderManagerIF;
 import de.bht.fpa.mailApp.s791739.model.data.Folder;
 import java.io.File;
 
 /**
  * Class manages the composite pattern of files and folders
  * @author Marco Kollosche, András Bucsi (FPA Strippgen)
- * @version Aufgabe 3 2014-11-13
+ * @version Aufgabe 7 2014-12-15
  */
 public class EmailFolderManager implements FolderManagerIF {
 
@@ -70,6 +71,10 @@ public class EmailFolderManager implements FolderManagerIF {
         return topFolder;
     }
 
+    /**
+     * Method sets the top folder
+     * @param file path of the new folder
+     */
     @Override
     public void setTopFolder(final File file) {
         topFolder.getComponents().removeAll(topFolder.getComponents());

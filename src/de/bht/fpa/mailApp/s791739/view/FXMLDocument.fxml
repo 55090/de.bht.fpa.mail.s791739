@@ -17,8 +17,9 @@
                <Menu text="Account" />
                <Menu text="File">
                     <items>
-                        <MenuItem id="fileOpen" text="Open" />
-                        <MenuItem id="fileHistory" text="History" />
+                        <MenuItem fx:id="fileOpen" id="FileOpen" text="Open" />
+                        <MenuItem fx:id="save" id="Save" text="Save" />
+                        <MenuItem fx:id="fileHistory" id="FileHistory" text="History" />
                     </items>
                </Menu>
            </menus>
@@ -81,7 +82,7 @@
                               </AnchorPane>
                               <!--// RIGHT TOP PANE END //-->
                               
-                              <!--// RIGHT BOTTOM PANE START //-->
+                              <!--// RIGHT BOTTOM CONTENT VIEW START //-->
                               <AnchorPane style="-fx-background-color: #fff;">
                                  <children>
                                     <Label prefWidth="80" style="-fx-font-weight: bold;" text="Sender: " AnchorPane.leftAnchor="15" AnchorPane.topAnchor="5" />
@@ -95,7 +96,7 @@
                                     <TextArea fx:id="tA_mailBody" editable="false" text="" wrapText="true" style="-fx-background-color: #fff;" AnchorPane.bottomAnchor="15" AnchorPane.leftAnchor="15" AnchorPane.rightAnchor="15" AnchorPane.topAnchor="90"/>
                                  </children>
                               </AnchorPane>
-                              <!--// RIGHT BOTTOM PANE END //-->
+                              <!--// RIGHT BOTTOM CONTENT VIEW END //-->
                          </items>
                       </SplitPane>
                   </children>

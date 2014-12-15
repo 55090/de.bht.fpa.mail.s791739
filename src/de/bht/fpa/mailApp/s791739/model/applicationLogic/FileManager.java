@@ -1,5 +1,6 @@
 package de.bht.fpa.mailApp.s791739.model.applicationLogic;
 
+import de.bht.fpa.mailApp.s791739.model.FolderManagerIF;
 import de.bht.fpa.mailApp.s791739.model.data.FileElement;
 import de.bht.fpa.mailApp.s791739.model.data.Folder;
 import java.io.File;
@@ -71,6 +72,10 @@ public class FileManager implements FolderManagerIF {
         return topFolder;
     }
 
+    /**
+     * Method sets the top folder
+     * @param file path of the new folder
+     */
     @Override
     public void setTopFolder(final File file) {
         topFolder.getComponents().removeAll(topFolder.getComponents());
