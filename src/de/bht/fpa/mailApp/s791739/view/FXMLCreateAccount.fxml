@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"  prefHeight="330.0" prefWidth="400.0">
+   <children>
+       <AnchorPane VBox.vgrow="ALWAYS"  scaleShape="false" style="-fx-border-color: #fff; -fx-border-width: 10;">
+            <children>
+                <Label prefWidth="80" style="-fx-font-weight: bold;" AnchorPane.leftAnchor="15" AnchorPane.topAnchor="25" text="name" />
+                <TextField fx:id="ac_tf_name"     AnchorPane.leftAnchor="110" AnchorPane.rightAnchor="15" AnchorPane.topAnchor="25"/>
+                
+                <Label prefWidth="80" style="-fx-font-weight: bold;" AnchorPane.leftAnchor="15" AnchorPane.topAnchor="75" text="host" />
+                <TextField fx:id="ac_tf_host"     AnchorPane.leftAnchor="110" AnchorPane.rightAnchor="15" AnchorPane.topAnchor="75"/>
+                
+                <Label prefWidth="80" style="-fx-font-weight: bold;" AnchorPane.leftAnchor="15" AnchorPane.topAnchor="125" text="username" />
+                <TextField fx:id="ac_tf_username" AnchorPane.leftAnchor="110" AnchorPane.rightAnchor="15" AnchorPane.topAnchor="125"/>
+                
+                <Label prefWidth="80" style="-fx-font-weight: bold;" AnchorPane.leftAnchor="15" AnchorPane.topAnchor="175" text="password" />
+                <TextField fx:id="ac_tf_password" AnchorPane.leftAnchor="110" AnchorPane.rightAnchor="15" AnchorPane.topAnchor="175"/>
+                <!-- Bottom part -->
+                <Label style="-fx-text-fill: #f00; -fx-font-weight: bold;" AnchorPane.leftAnchor="15" AnchorPane.bottomAnchor="60" AnchorPane.rightAnchor="15" text="text"/>
+                <Button fx:id="saveAccount"   mnemonicParsing="false" prefHeight="25.0" prefWidth="120.0" text="save"   AnchorPane.bottomAnchor="15" AnchorPane.rightAnchor= "15" />
+                <Button fx:id="cancelAccount" mnemonicParsing="false" prefHeight="25.0" prefWidth="100.0" text="cancel" AnchorPane.bottomAnchor="15" AnchorPane.rightAnchor="160" />
+            </children>
+       </AnchorPane>
+   </children>
+</VBox>

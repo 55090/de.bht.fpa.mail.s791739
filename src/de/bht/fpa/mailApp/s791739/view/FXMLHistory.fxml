@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <SplitPane VBox.vgrow="ALWAYS" dividerPositions="0.9" orientation="VERTICAL" scaleShape="false">
+        <items>
+          <AnchorPane>
+               <children>
+                  <ListView fx:id="history_list_view" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
+               </children>
+            </AnchorPane>
+            <AnchorPane prefHeight="50" prefWidth="350">
+               <children>
+                  <Button fx:id="history_open" layoutX="141.0" layoutY="8.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="112.0" text="Open Directory" />
+                  <Button fx:id="history_cancel" layoutX="272.0" layoutY="8.0" mnemonicParsing="false" text="cancel" />
+               </children>
+            </AnchorPane>
+        </items>
+      </SplitPane>
+   </children>
+</VBox>

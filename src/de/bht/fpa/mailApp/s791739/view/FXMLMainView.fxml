@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.effect.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox id="AnchorView" fx:id="vBoxMain" prefHeight="600.0" prefWidth="900.0" style="-fx-background-color: #000;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.bht.fpa.mailApp.s791739.controller.MainViewController">
+   <children>
+       <!--// MENU BAR START //-->
+       <MenuBar fx:id="menuBar">
+           <menus>
+               <Menu text="Account">
+               <items>
+                    <Menu fx:id="openAccount" id="OpenAccount" text="Open Account" >
+                        <items>
+                            <!-- add items to list -->
+                        </items>
+                    </Menu>
+                    <MenuItem fx:id="newAccount" id="NewAccount" text="New Account" />
+                </items>
+               </Menu>
+               <Menu text="File">
+                    <items>
+                        <MenuItem fx:id="fileOpen" id="FileOpen" text="Open" />
+                        <MenuItem fx:id="save" id="Save" text="Save" />
+                        <MenuItem fx:id="fileHistory" id="FileHistory" text="History" />
+                    </items>
+               </Menu>
+           </menus>
+       </MenuBar>
+       <!--// MENU BAR END //-->
+       
+      <!--// BIG SPLIT PANE START //--> 
+      <AnchorPane VBox.vgrow="ALWAYS">
+          <children>
+          <SplitPane id="HorizontalSplitView" dividerPositions="0.3" orientation="HORIZONTAL" style="-fx-border-color: #fff; -fx-border-width: 10;" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
+            <items>
+                
+               <!--// TREE VIEW START //--> 
+               <AnchorPane>
+                   <children>
+                      <TreeView fx:id="treeView" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0" />
+                   </children>
+               </AnchorPane>
+               <!--// TREE VIEW END //-->
+               
+               <!--// RIGHT SPLIT PANE START //-->
+               <AnchorPane>
+                  <children>
+                      <SplitPane id="VerticalSplitView" dividerPositions="0.5" orientation="VERTICAL" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
+                         <items>
+                              
+                              <!--// RIGHT TOP PANE START //-->
+                              <AnchorPane>
+                                <children>
+                                    <SplitPane id="RightHorizontalSplitView" dividerPositions="0.2" orientation="VERTICAL" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
+                                        <items>
+                                            <!--// RIGHT UPPER SEARCH FIELD START //-->
+                                            <AnchorPane>
+                                              <children>
+                                                  <Label id="Label_Search" prefWidth="70" text="Search:" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="15" />
+                                                  <Label fx:id="label_ItemCount" prefWidth="35" text="" AnchorPane.rightAnchor="10" AnchorPane.topAnchor="15" />
+                                                  <TextField fx:id="textField_Search" AnchorPane.leftAnchor="90" AnchorPane.rightAnchor="47" AnchorPane.topAnchor="12" />
+                                              </children>
+                                            </AnchorPane>
+                                            <!--// RIGHT UPPER SEARCH FIELD START //-->
+                                            <!--// RIGHT UPPER TABLE VIEW START //--> 
+                                            <AnchorPane>
+                                              <children>
+                                                   <TableView fx:id="tableView" editable="true" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
+                                                     <columns>
+                                                       <TableColumn id="Importance" fx:id="importance" minWidth="10"  prefWidth="75" text="Importance" />
+                                                       <TableColumn id="Received" fx:id="received" prefWidth="110" text="Received" />
+                                                       <TableColumn id="Read" fx:id="read" prefWidth="50" text="Read" />
+                                                       <TableColumn id="Sender" fx:id="sender" prefWidth="110" text="Sender" />
+                                                       <TableColumn id="Recipients" fx:id="recipients" prefWidth="110" text="Recipients" />
+                                                       <TableColumn id="Subject" fx:id="subject" prefWidth="150" text="Subject" />
+                                                     </columns>
+                                                   </TableView>
+                                              </children>
+                                            </AnchorPane>
+                                            <!--// RIGHT UPPER TABLE VIEW END //-->
+                                        </items>
+                                    </SplitPane>
+                                </children>
+                              </AnchorPane>
+                              <!--// RIGHT TOP PANE END //-->
+                              
+                              <!--// RIGHT BOTTOM CONTENT VIEW START //-->
+                              <AnchorPane style="-fx-background-color: #fff;">
+                                 <children>
+                                    <Label prefWidth="80" style="-fx-font-weight: bold;" text="Sender: " AnchorPane.leftAnchor="15" AnchorPane.topAnchor="5" />
+                                    <Label fx:id="l_sender_placeholder" text="" AnchorPane.leftAnchor="100" AnchorPane.rightAnchor="15" AnchorPane.topAnchor="5" />
+                                    <Label prefWidth="80" style="-fx-font-weight: bold;" text="Subject:" AnchorPane.leftAnchor="15" AnchorPane.topAnchor="25" />
+                                    <Label fx:id="l_subject_placeholder" text="" AnchorPane.leftAnchor="100" AnchorPane.rightAnchor="15" AnchorPane.topAnchor="25" />
+                                    <Label prefWidth="80" style="-fx-font-weight: bold;" text="Received:" AnchorPane.leftAnchor="15" AnchorPane.topAnchor="45" />
+                                    <Label fx:id="l_received_placeholder" text="" AnchorPane.leftAnchor="100" AnchorPane.rightAnchor="15" AnchorPane.topAnchor="45" />
+                                    <Label prefWidth="80" style="-fx-font-weight: bold;" text="Receiver:" AnchorPane.leftAnchor="15" AnchorPane.topAnchor="65" />
+                                    <Label fx:id="l_receiver_placeholder" text="" AnchorPane.leftAnchor="100" AnchorPane.rightAnchor="15" AnchorPane.topAnchor="65" />
+                                    <TextArea fx:id="tA_mailBody" editable="false" text="" wrapText="true" style="-fx-background-color: #fff;" AnchorPane.bottomAnchor="15" AnchorPane.leftAnchor="15" AnchorPane.rightAnchor="15" AnchorPane.topAnchor="90"/>
+                                 </children>
+                              </AnchorPane>
+                              <!--// RIGHT BOTTOM CONTENT VIEW END //-->
+                         </items>
+                      </SplitPane>
+                  </children>
+               </AnchorPane>
+               <!--// RIGHT SPLIT PANE END //-->
+               
+            </items>
+         </SplitPane>
+          </children>
+      </AnchorPane>
+      <!--// BIG SPLIT PANE END //-->
+       
+   </children>
+</VBox>
