@@ -16,11 +16,9 @@
            <menus>
                <Menu text="Account">
                <items>
-                    <Menu fx:id="openAccount" id="OpenAccount" text="Open Account" >
-                        <items>
-                            <!-- add items to list -->
-                        </items>
-                    </Menu>
+                    <Menu fx:id="openAccount" id="OpenAccount" text="Open Account" />
+                    <Menu fx:id="editAccount" id="EditAccount" text="Edit Account" />
+                        
                     <MenuItem fx:id="newAccount" id="NewAccount" text="New Account" />
                 </items>
                </Menu>

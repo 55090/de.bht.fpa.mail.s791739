@@ -1,6 +1,7 @@
 package de.bht.fpa.mailApp.s791739.model.data;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,7 +10,7 @@ import java.util.List;
  * @author Simone Strippgen
  *
  */
-public class Folder extends Component {
+public class Folder extends Component implements Serializable{
 
     private final boolean expandable;
     private final ArrayList<Component> content;
@@ -43,5 +44,10 @@ public class Folder extends Component {
 
     public void addEmail( final Email message ) {
         emails.add( message );
+    }
+    
+    @Override
+    public String toString(){
+        return super.toString()+(emails.size()>0?" ("+emails.size()+")":"");
     }
  }

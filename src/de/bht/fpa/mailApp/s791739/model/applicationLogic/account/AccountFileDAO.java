@@ -23,7 +23,6 @@ public class AccountFileDAO implements AccountDAOIF {
 
     public AccountFileDAO() {
         //for testing: serializes test accounts
-        TestDBDataProvider.createAccounts(); // muss im Nachhinein auskommentiert werden
         if (!ACCOUNT_FILE.exists()) {
             saveAccounts(TestAccountProvider.createAccounts());
         }
@@ -31,7 +30,7 @@ public class AccountFileDAO implements AccountDAOIF {
 
     @Override
     public List<Account> getAllAccounts() {
-        List<Account> list = new ArrayList<Account>();
+        List<Account> list = new ArrayList<>();
         Account acc = null;
         try {
             FileInputStream fileInput = new FileInputStream(ACCOUNT_FILE);
@@ -42,7 +41,7 @@ public class AccountFileDAO implements AccountDAOIF {
                 acc = (Account) is.readObject();
             }
             is.close();
-        } catch (Exception ex) {
+        } catch (IOException | ClassNotFoundException ex) {
 //            do nothing
         }
         return list;

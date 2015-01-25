@@ -13,25 +13,35 @@ import java.util.List;
  * @author Kobe
  */
 public class AccountManager implements AccountManagerIF{
+    private final AccountDAOIF dao;
+    
+    public AccountManager(){
+        this.dao = new AccountFileDAO();
+    }
 
     @Override
-    public Account getAccount(String name) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Account getAccount( final String name ) {
+        for( final Account account : this.dao.getAllAccounts() ){
+            if( account.getName().equals( name ) ){
+                return account;
+            }
+        }
+        return null;
     }
 
     @Override
     public List<Account> getAllAccounts() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return this.dao.getAllAccounts();
     }
 
     @Override
-    public boolean saveAccount(Account acc) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public boolean saveAccount( final Account acc ) {
+        return acc.equals( this.dao.saveAccount( acc ) );
     }
 
     @Override
-    public boolean updateAccount(Account account) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public boolean updateAccount( final Account account ) {
+        return this.dao.updateAccount( account );
     }
     
 }

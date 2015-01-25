@@ -55,7 +55,5 @@ public abstract class Component {
     @Override
     public String toString() {
         return name;
-        // hier (Zahl) einfügen 
-        // name wird dadurch nicht verändert...
     }
 }

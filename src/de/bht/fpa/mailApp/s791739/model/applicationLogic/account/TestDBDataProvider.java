@@ -26,9 +26,9 @@ public class TestDBDataProvider {
         List<Account> accs = TestAccountProvider.createAccounts();
         EntityTransaction trans = em.getTransaction();
         trans.begin();
-        for (Account a : accs) {
+        accs.stream().forEach((a) -> {
             em.persist(a);
-        }
+        });
         trans.commit();
         em.close();
     }

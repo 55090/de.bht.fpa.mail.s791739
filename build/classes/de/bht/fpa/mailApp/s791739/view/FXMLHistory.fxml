@@ -16,7 +16,7 @@
                   <ListView fx:id="history_list_view" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
                </children>
             </AnchorPane>
-          <AnchorPane prefHeight="50" prefWidth="350">
+            <AnchorPane prefHeight="50" prefWidth="350">
                <children>
                   <Button fx:id="history_open" layoutX="141.0" layoutY="8.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="112.0" text="Open Directory" />
                   <Button fx:id="history_cancel" layoutX="272.0" layoutY="8.0" mnemonicParsing="false" text="cancel" />

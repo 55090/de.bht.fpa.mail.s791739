@@ -3,10 +3,13 @@ package de.bht.fpa.mailApp.s791739.model.applicationLogic;
 import de.bht.fpa.mailApp.s791739.model.ApplicationLogicIF;
 import de.bht.fpa.mailApp.s791739.model.EmailManagerIF;
 import de.bht.fpa.mailApp.s791739.model.FolderManagerIF;
+import de.bht.fpa.mailApp.s791739.model.applicationLogic.account.AccountManager;
+import de.bht.fpa.mailApp.s791739.model.applicationLogic.account.AccountManagerIF;
 import de.bht.fpa.mailApp.s791739.model.data.Account;
 import de.bht.fpa.mailApp.s791739.model.data.Email;
 import de.bht.fpa.mailApp.s791739.model.data.Folder;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,14 +23,16 @@ public class Facade implements ApplicationLogicIF{
 
     private final EmailManagerIF  mailManager;
     private final FolderManagerIF fileManager;
+    private final AccountManagerIF accountManager;
     
     /**
      * Contructor for ApplicationLogic facade class
      * @param path the initial directory path
      */
     public Facade(final File path){
-        fileManager = new FileManager(path);
-        mailManager = new EmailManager(fileManager.getTopFolder());
+        this.fileManager = new FileManager(path);
+        this.mailManager = new EmailManager(this.fileManager.getTopFolder());
+        this.accountManager = new AccountManager();
         
     }
     
@@ -37,7 +42,7 @@ public class Facade implements ApplicationLogicIF{
      */
     @Override
     public Folder getTopFolder() {
-        return fileManager.getTopFolder();
+        return this.fileManager.getTopFolder();
     }
 
     /**
@@ -46,7 +51,7 @@ public class Facade implements ApplicationLogicIF{
      */
     @Override
     public void loadContent(Folder folder) {
-        fileManager.loadContent(folder);
+        this.fileManager.loadContent(folder);
     }
 
     /**
@@ -55,7 +60,7 @@ public class Facade implements ApplicationLogicIF{
      */
     @Override
     public List<Email> search(String pattern) {
-        return mailManager.search(pattern);
+        return this.mailManager.search(pattern);
     }
 
     /**
@@ -63,7 +68,7 @@ public class Facade implements ApplicationLogicIF{
      */
     @Override
     public void loadEmails(Folder folder) {
-        mailManager.loadEmails(folder);
+        this.mailManager.loadEmails(folder);
     }
 
     /**
@@ -71,7 +76,7 @@ public class Facade implements ApplicationLogicIF{
      */
     @Override
     public void changeDirectory(File file) {
-        fileManager.setTopFolder(file);
+        this.fileManager.setTopFolder(file);
     }
 
     /**
@@ -80,31 +85,46 @@ public class Facade implements ApplicationLogicIF{
      */
     @Override
     public void saveEmails(File file) {
-        mailManager.saveEmails(file);
+        this.mailManager.saveEmails(file);
     }
 
     @Override
-    public void openAccount(String name) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void openAccount( final String name ) {
+        Account account = this.accountManager.getAccount(name);
+        changeDirectory(new File(account.getTop().getPath()));
     }
 
+    /**
+     * Retains all names from the account list and adds it to a String list, which is returned
+     * @return String List with account names
+     */
     @Override
     public List<String> getAllAccounts() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        List<String> accountNames = new ArrayList<>();
+        accountManager.getAllAccounts().stream().map((Account account) 
+                -> account.getName()).filter((String name) 
+                        -> (name!=null)).forEach((String name) 
+                                -> {accountNames.add(name);});
+        return accountNames;
     }
 
     @Override
-    public Account getAccount(String name) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Account getAccount( final String name ) {
+        return this.accountManager.getAccount(name);
     }
 
     @Override
-    public boolean saveAccount(Account account) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public boolean saveAccount( final Account account ) {
+        return this.accountManager.saveAccount( account );
     }
 
     @Override
-    public void updateAccount(Account account) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void updateAccount( final Account account ) {
+        boolean updated = this.accountManager.updateAccount(account);
+        if(updated){
+            System.out.println("Account: "+account.getName()+" was updated successfully!");
+        } else {
+            System.out.println("Account: "+account.getName()+" could not be updated!");
+        }
     }
 }

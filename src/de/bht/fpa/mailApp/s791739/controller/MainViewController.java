@@ -9,13 +9,18 @@ import de.bht.fpa.mailApp.s791739.model.data.Folder;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -26,6 +31,7 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -46,6 +52,8 @@ import javafx.stage.StageStyle;
  * @version Aufgabe 6 2014-12-15
  */
 public class MainViewController implements Initializable {
+    
+    private static final DateFormat FORMAT = DateFormat.getDateTimeInstance( DateFormat.FULL, DateFormat.SHORT, Locale.GERMANY );
     
     // Image for the folder visualization
     private final Image FOLDER_ICON      = new Image( getClass().getResourceAsStream( "/de/bht/fpa/mailApp/s791739/model/data/icons/folder_Icon.png" ) );
@@ -87,9 +95,14 @@ public class MainViewController implements Initializable {
     MenuBar menuBar;
     
     @FXML
+    Menu    openAccount, 
+            editAccount;
+    
+    @FXML
     MenuItem fileOpen   , 
              save       , 
-             fileHistory;
+             fileHistory,
+             newAccount ;
 
     @FXML
     TextField textField_Search;
@@ -108,6 +121,9 @@ public class MainViewController implements Initializable {
                                recipients, 
                                subject   ;
 
+    /*@FXML
+    TableColumn<Email, Date> received;*/
+         
     @FXML
     Label l_sender_placeholder  , 
           l_subject_placeholder ,
@@ -155,10 +171,26 @@ public class MainViewController implements Initializable {
      * Method configures the Menu Items with event handler
      */
     private void configureMenue(){
+        loadAccountMenus();
         fileOpen   .setOnAction( ( event )-> handleMenueEvent( event ) );
         save       .setOnAction( ( event )-> handleMenueEvent( event ) );
         fileHistory.setOnAction( ( event )-> handleMenueEvent( event ) );
+        newAccount .setOnAction( ( event )-> handleMenueEvent( event ) );
         save.setDisable(true);
+    }
+    
+    private void loadAccountMenus(){
+        final List<String> accounts = facade.getAllAccounts();
+        for(final String account : accounts){
+            final MenuItem open, edit;
+            open = new MenuItem(account);
+            open.setUserData(facade.getAccount(account));
+            edit = new MenuItem(account);
+            edit.setUserData(facade.getAccount(account));
+            openAccount.getItems().add(open);
+            editAccount.getItems().add(edit);
+            
+        }
     }
     /**
      * Method configures the TableView Columns
@@ -176,6 +208,19 @@ public class MainViewController implements Initializable {
                 (ObservableValue<? extends Email> observableVal, Email oldVal, Email newVal) 
                         -> handleTableViewSelection(newVal)
         );
+        
+        // inspired by https://community.oracle.com/thread/2407932
+        received.setComparator((String t, String t1) -> {
+            try {
+                Date d1 = FORMAT.parse(t);
+                Date d2 = FORMAT.parse(t1);
+                return Long.compare(d1.getTime(),d2.getTime());
+            } catch ( ParseException ex ) {
+                //
+            }
+            return -1;
+        }); 
+        received.setCellValueFactory((CellDataFeatures<Email, String> param) -> new SimpleObjectProperty(param.getValue().getReceived()));
     }
     
     /**
@@ -234,6 +279,9 @@ public class MainViewController implements Initializable {
                 }  
                 break;
             case "FileHistory": showHistoryView(); 
+                break;
+                
+             case "NewAccount": showCreateAccountView(); 
                 break;
             default:
                 break;
@@ -305,7 +353,7 @@ public class MainViewController implements Initializable {
      */
     private void handleSearch(final String searchText) {
         String s = searchText.toLowerCase();
-        tableView.setItems((ObservableList<Email>) facade.search(s));
+        tableView.setItems(FXCollections.observableArrayList(facade.search(s)));
         setCurrentEmailSizeToLabel();
     }
     
@@ -401,8 +449,8 @@ public class MainViewController implements Initializable {
      * Method configures and shows the history view
      */
     private void showHistoryView() {
-        Stage editStage = new Stage( StageStyle.UTILITY );
-        editStage.setTitle( "Select Base Directory" );
+        Stage historyStage = new Stage( StageStyle.UTILITY );
+        historyStage.setTitle( "Select Base Directory" );
         URL location = getClass().getResource( "/de/bht/fpa/mailApp/s791739/view/FXMLHistory.fxml" );
 
         FXMLLoader fxmlLoader = new FXMLLoader();
@@ -411,13 +459,32 @@ public class MainViewController implements Initializable {
         try {
             Pane myPane = (Pane) fxmlLoader.load();
             Scene myScene = new Scene( myPane );
-            editStage.setScene( myScene );
-            editStage.show();
+            historyStage.setScene( myScene );
+            historyStage.show();
         } catch ( IOException ex ) {
             Logger.getLogger(MainViewController.class.getName() ).log( Level.SEVERE, null, ex );
         }
     }
+    
+    private void showCreateAccountView() {
+            Stage createAccountStage = new Stage(StageStyle.UTILITY);
+            createAccountStage.setTitle( "New Account" );
+            URL location = getClass().getResource("/de/bht/fpa/mailApp/s791739/view/FXMLCreateAccount.fxml");
 
+            FXMLLoader fxmlLoader = new FXMLLoader();
+            fxmlLoader.setLocation(location);
+            fxmlLoader.setController(new CreateAccountController(facade));
+            try {
+                Pane myPane = (Pane) fxmlLoader.load();
+                Scene myScene = new Scene(myPane);
+                createAccountStage.setScene(myScene);
+                createAccountStage.show();
+            } catch (IOException ex) {
+                Logger.getLogger(MainViewController.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+        }
+    }
+    
     /**
      * returns the history list of used directories
      * @return 

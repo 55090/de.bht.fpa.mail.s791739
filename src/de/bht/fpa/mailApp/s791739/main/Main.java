@@ -15,7 +15,7 @@ public class Main extends Application {
 
     @Override
     public void start( Stage stage ) throws Exception {
-	Parent root = FXMLLoader.load( getClass().getResource( "/de/bht/fpa/mailApp/s791739/view/FXMLDocument.fxml" ) );
+	Parent root = FXMLLoader.load( getClass().getResource( "/de/bht/fpa/mailApp/s791739/view/FXMLMainView.fxml" ) );
 	Scene scene = new Scene( root );
 	
 	stage.setScene( scene );
