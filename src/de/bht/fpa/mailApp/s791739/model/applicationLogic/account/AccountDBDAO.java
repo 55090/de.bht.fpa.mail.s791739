@@ -19,7 +19,7 @@ public class AccountDBDAO implements AccountDAOIF {
     private final EntityManagerFactory entityManagerFactory;
 
     public AccountDBDAO() {
-        //TestDBDataProvider.createAccounts();
+        TestDBDataProvider.createAccounts();
         entityManagerFactory = Persistence.createEntityManagerFactory("fpa");
     }
 
@@ -32,7 +32,7 @@ public class AccountDBDAO implements AccountDAOIF {
     @Override
     public List<Account> getAllAccounts() {
         final EntityManager entityManager = entityManagerFactory.createEntityManager();
-        final List<Account> accounts = entityManager.createQuery("SELECT accounts FROM Account accounts").getResultList();
+        final List<Account> accounts = (entityManager.createQuery("SELECT accounts FROM Account accounts")).getResultList();
         entityManager.close();
         return accounts;
     }
@@ -40,23 +40,23 @@ public class AccountDBDAO implements AccountDAOIF {
     /**
      * Method saves the current account to the database via the PU
      * 
-     * @param acc current account to be saved
+     * @param account current account to be saved
      * @return the saved account (weird but yes...)
      */
     @Override
-    public Account saveAccount( final Account acc ) {
+    public Account saveAccount( final Account account ) {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         EntityTransaction transaction = entityManager.getTransaction();
         transaction.begin();
         try {
-            entityManager.persist( acc );
+            entityManager.persist( account );
             transaction.  commit();
         } catch ( final IllegalArgumentException iae ) {
             Logger.getLogger(AccountDBDAO.class.getName()).log(Level.SEVERE, null, iae);
         } finally {
             entityManager.close();
         }
-        return acc;
+        return account;
     }
 
     /**

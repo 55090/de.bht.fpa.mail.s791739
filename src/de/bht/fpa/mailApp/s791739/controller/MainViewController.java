@@ -1,6 +1,6 @@
 package de.bht.fpa.mailApp.s791739.controller;
 
-import de.bht.fpa.mailApp.s791739.model.ApplicationLogicIF;
+import de.bht.fpa.mailApp.s791739.model.applicationLogic.ApplicationLogicIF;
 import de.bht.fpa.mailApp.s791739.model.applicationLogic.Facade;
 import de.bht.fpa.mailApp.s791739.model.data.Account;
 import de.bht.fpa.mailApp.s791739.model.data.Component;
@@ -50,7 +50,7 @@ import javafx.stage.StageStyle;
 /**
  * Controller Class for FXMLDocument
  * @author Marco Kollosche, András Bucsi (FPA Strippgen) Gruppe 4
- * @version Aufgabe 8 2015-01-29
+ * @version Aufgabe 10 2015-01-29
  */
 public class MainViewController implements Initializable {
     
@@ -67,7 +67,7 @@ public class MainViewController implements Initializable {
     private final Image FILE_ICON        = new Image( getClass().getResourceAsStream( "/de/bht/fpa/mailApp/s791739/model/data/icons/file_Icon.png" ) );
     
     // String of root path
-    private final static String S_DEFAULT_ROOTPATH = "/";
+    private final static String S_DEFAULT_ROOTPATH = "./emails/Account";
     
     // File for initial path
     private final static File DEFAULT_ROOTPATH     = new File( S_DEFAULT_ROOTPATH );

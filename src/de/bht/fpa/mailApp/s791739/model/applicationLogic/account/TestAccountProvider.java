@@ -1,6 +1,5 @@
 package de.bht.fpa.mailApp.s791739.model.applicationLogic.account;
 
-
 import de.bht.fpa.mailApp.s791739.model.data.Account;
 import de.bht.fpa.mailApp.s791739.model.data.Folder;
 import java.io.File;
@@ -35,6 +34,8 @@ class TestAccountProvider {
         acc = new Account("Anna", "smtp.gmail.com", "anna@gmail.com", "anna");
         folder = new Folder(new File(TESTDATA_HOME, "Anna"), true);
         acc.setTop(folder);
+        accounts.add(acc);
+        acc = new Account("Google-Test", "smtp.gmail.com", "huber.fpa@gmail.com", "ernaHuberFpa"); 
         accounts.add(acc);
         return accounts;
     }

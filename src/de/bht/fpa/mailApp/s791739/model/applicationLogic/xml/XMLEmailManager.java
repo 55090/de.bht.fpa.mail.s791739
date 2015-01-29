@@ -1,6 +1,6 @@
-package de.bht.fpa.mailApp.s791739.model.applicationLogic;
+package de.bht.fpa.mailApp.s791739.model.applicationLogic.xml;
 
-import de.bht.fpa.mailApp.s791739.model.EmailManagerIF;
+import de.bht.fpa.mailApp.s791739.model.applicationLogic.EmailManagerIF;
 import de.bht.fpa.mailApp.s791739.model.data.Email;
 import de.bht.fpa.mailApp.s791739.model.data.Folder;
 import java.io.File;
@@ -13,14 +13,12 @@ import javax.xml.bind.JAXB;
  * @author Marco Kollosche, András Bucsi (FPA Strippgen) Gruppe 4
  * @version Aufgabe 7
  */
-public class EmailManager implements EmailManagerIF {
+public class XMLEmailManager implements EmailManagerIF {
     private Folder currentFolder;
     /**
      * Constructor of MailManager
-     * @param folder
      */
-    public EmailManager( final Folder folder ){
-        this.currentFolder = folder;
+    public XMLEmailManager(){
     }
 
     /**
@@ -30,12 +28,11 @@ public class EmailManager implements EmailManagerIF {
     @Override
     public void loadEmails( final Folder folder ) {
         setCurrentFolder(folder);
-        if ( !this.currentFolder.getEmails().isEmpty() ){
-            return;
-        }
-        for ( final File filePath : new File( this.currentFolder.getPath() ).listFiles() ){
-            if( filePath.getName().endsWith(".xml") ){
-                this.currentFolder.addEmail( JAXB.unmarshal( filePath, Email.class ) );
+        if ( !this.currentFolder.getEmails().isEmpty() && new File(folder.getPath()).exists() ){
+            for ( final File filePath : new File( this.currentFolder.getPath() ).listFiles() ){
+                if( filePath.getName().endsWith(".xml") ){
+                    this.currentFolder.addEmail( JAXB.unmarshal( filePath, Email.class ) );
+                }
             }
         }
     }

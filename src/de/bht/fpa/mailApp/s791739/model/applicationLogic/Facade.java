@@ -1,10 +1,11 @@
 package de.bht.fpa.mailApp.s791739.model.applicationLogic;
 
-import de.bht.fpa.mailApp.s791739.model.ApplicationLogicIF;
-import de.bht.fpa.mailApp.s791739.model.EmailManagerIF;
-import de.bht.fpa.mailApp.s791739.model.FolderManagerIF;
+import de.bht.fpa.mailApp.s791739.model.applicationLogic.xml.FolderManager;
+import de.bht.fpa.mailApp.s791739.model.applicationLogic.xml.XMLEmailManager;
 import de.bht.fpa.mailApp.s791739.model.applicationLogic.account.AccountManager;
 import de.bht.fpa.mailApp.s791739.model.applicationLogic.account.AccountManagerIF;
+import de.bht.fpa.mailApp.s791739.model.applicationLogic.imap.IMapFolderManager;
+import de.bht.fpa.mailApp.s791739.model.applicationLogic.imap.IMapEmailManager;
 import de.bht.fpa.mailApp.s791739.model.data.Account;
 import de.bht.fpa.mailApp.s791739.model.data.Email;
 import de.bht.fpa.mailApp.s791739.model.data.Folder;
@@ -21,19 +22,30 @@ import java.util.List;
  */
 public class Facade implements ApplicationLogicIF{
 
-    private final EmailManagerIF  mailManager;
-    private final FolderManagerIF fileManager;
-    private final AccountManagerIF accountManager;
+    private       EmailManagerIF    mailManager;
+    private       FolderManagerIF   folderManager;
+    private final AccountManagerIF  accountManager;
+    private       String            type;
+    private boolean isRemote;
     
     /**
      * Contructor for ApplicationLogic facade class
      * @param path the initial directory path
      */
     public Facade(final File path){
-        this.fileManager = new FileManager(path);
-        this.mailManager = new EmailManager(this.fileManager.getTopFolder());
+        this.folderManager    = new FolderManager(path);
+        this.mailManager    = new XMLEmailManager();
         this.accountManager = new AccountManager();
+        this.isRemote       = false;
         
+    }
+    
+    /**
+     * Method returns whether it is remote or local
+     * @return 
+     */
+    public boolean getType(){
+        return this.isRemote;
     }
     
     /**
@@ -42,7 +54,7 @@ public class Facade implements ApplicationLogicIF{
      */
     @Override
     public Folder getTopFolder() {
-        return this.fileManager.getTopFolder();
+        return this.folderManager.getTopFolder();
     }
 
     /**
@@ -51,7 +63,7 @@ public class Facade implements ApplicationLogicIF{
      */
     @Override
     public void loadContent(Folder folder) {
-        this.fileManager.loadContent(folder);
+        this.folderManager.loadContent(folder);
     }
 
     /**
@@ -72,11 +84,13 @@ public class Facade implements ApplicationLogicIF{
     }
 
     /**
-     * Method delegates tasks to FileManager to change top folder
+     * Method delegates tasks to FolderManager to change top folder
      */
     @Override
     public void changeDirectory(File file) {
-        this.fileManager.setTopFolder(file);
+        this.folderManager.setTopFolder(file);
+        mailManager = new XMLEmailManager();
+        isRemote = false;
     }
 
     /**
@@ -90,8 +104,17 @@ public class Facade implements ApplicationLogicIF{
 
     @Override
     public void openAccount( final String name ) {
-        Account account = this.accountManager.getAccount(name);
-        changeDirectory(new File(account.getTop().getPath()));
+        Account account;
+        if (name.contains("Google")){
+            account         = this.accountManager.getAccount(name);
+            folderManager   = new IMapFolderManager(account);
+            mailManager     = new IMapEmailManager(account);
+            isRemote        = true;
+        } else{
+             account = this.accountManager.getAccount(name);
+             folderManager = new FolderManager(new File(getAccount(name).getTop().getPath()));
+             changeDirectory(new File(account.getTop().getPath()));
+        }
     }
 
     /**
@@ -126,7 +149,13 @@ public class Facade implements ApplicationLogicIF{
      */
     @Override
     public boolean saveAccount( final Account account ) {
-        return this.accountManager.saveAccount( account );
+        final boolean saved = this.accountManager.saveAccount( account );
+        if(saved){
+            System.out.println("Account: "+account.getName()+" was  saved sucessfully!");
+        } else {
+            System.err.println("Account: "+account.getName()+" could not be saved!");
+        }
+        return saved;
     }
 
     /**
@@ -140,7 +169,7 @@ public class Facade implements ApplicationLogicIF{
         if(updated){
             System.out.println("Account: "+account.getName()+" was updated successfully!");
         } else {
-            System.out.println("Account: "+account.getName()+" could not be updated!");
+            System.err.println("Account: "+account.getName()+" could not be updated!");
         }
     }
 }

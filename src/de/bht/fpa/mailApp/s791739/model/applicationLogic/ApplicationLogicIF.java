@@ -1,4 +1,4 @@
-package de.bht.fpa.mailApp.s791739.model;
+package de.bht.fpa.mailApp.s791739.model.applicationLogic;
 
 import de.bht.fpa.mailApp.s791739.model.data.Account;
 import de.bht.fpa.mailApp.s791739.model.data.Email;
