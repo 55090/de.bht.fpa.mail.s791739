@@ -19,14 +19,14 @@ public interface AccountDAOIF {
 
     /**
      * Saves the given Account in the data store.
-     * @param account  the account that should be saved
+     * @param acc
      * @return account which was stored in the data store
      */
     Account saveAccount(Account acc);
     
     /**
      * Updates the given Account in the data store.
-     * @param account  the account that should be updated
+     * @param acc  the account that should be updated
      * @return true if update was successful
      */
     boolean updateAccount(Account acc);

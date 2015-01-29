@@ -1,6 +1,5 @@
 package de.bht.fpa.mailApp.s791739.controller;
 
-import de.bht.fpa.mailApp.s791739.model.ApplicationLogicIF;
 import de.bht.fpa.mailApp.s791739.model.data.Account;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -14,15 +13,21 @@ import javafx.scene.control.TextField;
 import javafx.stage.Window;
 import javafx.stage.Stage;
 
+/**
+ * Controller Class for FXMLDocument
+ * @author Marco Kollosche, András Bucsi (FPA Strippgen) Gruppe 4
+ * @version Aufgabe 8 2015-01-29
+ */
 public class CreateAccountController implements Initializable{
-    private final ApplicationLogicIF facade;
+    private final MainViewController mVCtrl;
     /**
-     * Indicates Mode 
+     * Indicates Mode of Create/Edit
      * true  -> create account
      * false -> edit account
      */
-    private final boolean mode;
+    private final boolean newAccount;
     private Account account;
+    private String backUpName;
 
     @FXML
     TextField ac_tf_name,
@@ -40,24 +45,27 @@ public class CreateAccountController implements Initializable{
     Button ac_b_saveAccount, 
            ac_b_cancel;
     
-    public CreateAccountController( final ApplicationLogicIF facade ){
-        this.facade = facade; 
-        account = null;
-        mode = false;
+    public CreateAccountController( final  MainViewController mVCtrl ){
+        this.mVCtrl = mVCtrl; 
+        account     = null;
+        newAccount  = ( account == null );
     }
     
-    public CreateAccountController( final ApplicationLogicIF facade, final Account account ){
-        this.facade = facade; 
-        this.account = account;
-        mode = ( account != null );
+    public CreateAccountController( final MainViewController mVCtrl, final Account account ){
+        this.mVCtrl     = mVCtrl; 
+        this.account    = account;
+        this.backUpName = account.getName();
+        newAccount      = ( account == null );
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         ac_b_saveAccount.setOnAction((ActionEvent event) -> handleButtonEvent(event));
+        ac_b_saveAccount.setText("update");
         ac_b_cancel.     setOnAction((ActionEvent event) -> handleButtonEvent(event));
-        if(mode){
+        if(!newAccount){
             ac_tf_name.          setText(account.getName());
+            ac_tf_name.setEditable(false);
             ac_tf_host.          setText(account.getHost());
             ac_tf_username.      setText(account.getUsername());
             ac_pf_password.      setText(account.getPassword());
@@ -69,7 +77,7 @@ public class CreateAccountController implements Initializable{
         switch( ( (Button) event.getSource() ).getId() ){
             case "save":    
                 if(validateForm()){
-                    if(!mode){
+                    if(newAccount){
                         account = new Account();
                     }
                     final String name     = ac_tf_name.getText(); 
@@ -80,7 +88,11 @@ public class CreateAccountController implements Initializable{
                     account.setHost(host);
                     account.setUsername(username);
                     account.setPassword(password);
-                    facade.saveAccount(account);
+                    if(newAccount){
+                        mVCtrl.saveAccount(account);
+                    } else {
+                        mVCtrl.updateAccount(account);
+                    }
                     close( ac_b_saveAccount.getScene().getWindow() );
                 }
                             break;
@@ -89,18 +101,6 @@ public class CreateAccountController implements Initializable{
             default:        break;
         }
     }
-    
-        /**
-     * Method closes the View
-     * @param window origin view
-     */
-    private void close( final Window window ) {
-        ( (Stage) window ).close();
-    }
-
-    /*private void setHeading() {
-        ((Stage)(ac_b_cancel.getScene().getWindow())).setTitle(mode?"New Account":"Edit Account");
-    }*/
 
     private boolean validateForm() {
         String message ="";
@@ -143,11 +143,24 @@ public class CreateAccountController implements Initializable{
             ac_pf_passwordRepeat.setStyle("-fx-background-color: #ffdddd;");
         }
         if (message.length()<1){
-            ac_l_error_message.setText(message);
-            return true;
+            if( mVCtrl.accountNameTaken( ac_tf_name.getText() ) &&  account == null ){
+                message = message + "Name already taken. Choose different name.";
+                ac_l_error_message.setText(message);
+                return false;
+            } else {
+                return true;
+            }
         } else {
             ac_l_error_message.setText(message);
             return false;
         }
+    }
+    
+    /**
+     * Method closes the View
+     * @param window origin view
+     */
+    private void close( final Window window ) {
+        ( (Stage) window ).close();
     }
 }

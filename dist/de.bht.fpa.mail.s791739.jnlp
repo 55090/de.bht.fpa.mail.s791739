@@ -11,7 +11,7 @@
   </resources>
   <resources>
     <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
-    <jar href="de.bht.fpa.mail.s791739.jar" size="44624" download="eager" />
+    <jar href="de.bht.fpa.mail.s791739.jar" size="47373" download="eager" />
     <jar href="lib/eclipselink.jar" size="8384130" download="eager" />
     <jar href="lib/javax.persistence_2.1.0.v201304241213.jar" size="160564" download="eager" />
     <jar href="lib/mysql-connector-java-5.1.23-bin.jar" size="827921" download="eager" />

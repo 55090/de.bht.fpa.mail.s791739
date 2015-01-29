@@ -108,16 +108,32 @@ public class Facade implements ApplicationLogicIF{
         return accountNames;
     }
 
+    /**
+     * Method gets the account retained by a given String (name)
+     * facade delegates the task to the account manager
+     * @param name the name to retain the account for
+     * @return the account or null if no matches
+     */
     @Override
     public Account getAccount( final String name ) {
         return this.accountManager.getAccount(name);
     }
 
+    /**
+     * Method saves the current account... it delegates the task to the account manager
+     * @param account the current account whis shall be saved
+     * @return status of the saving operation (true = success / false = incomplete)
+     */
     @Override
     public boolean saveAccount( final Account account ) {
         return this.accountManager.saveAccount( account );
     }
 
+    /**
+     * Method updates a current account with the saved match. It delegates the task 
+     * to the account manager
+     * @param account the current account, that shall be updated
+     */
     @Override
     public void updateAccount( final Account account ) {
         boolean updated = this.accountManager.updateAccount(account);
