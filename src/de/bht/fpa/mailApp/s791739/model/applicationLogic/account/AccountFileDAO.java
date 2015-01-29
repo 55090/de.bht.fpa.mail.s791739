@@ -31,18 +31,17 @@ public class AccountFileDAO implements AccountDAOIF {
     @Override
     public List<Account> getAllAccounts() {
         List<Account> list = new ArrayList<>();
-        Account acc = null;
         try {
+            Account acc;
             FileInputStream fileInput = new FileInputStream(ACCOUNT_FILE);
-            ObjectInputStream is = new ObjectInputStream(fileInput);
-            acc = (Account) is.readObject();
-            while (acc != null) {
-                list.add(acc);
-                acc = (Account) is.readObject();
+            try (ObjectInputStream is = new ObjectInputStream(fileInput)) {
+                do {
+                   acc = (Account) is.readObject();
+                   list.add(acc);
+                }while(acc != null && acc.getName()!=null);
             }
-            is.close();
         } catch (IOException | ClassNotFoundException ex) {
-//            do nothing
+            //System.err.println(ex.getMessage());
         }
         return list;
     }
@@ -71,14 +70,13 @@ public class AccountFileDAO implements AccountDAOIF {
     private void saveAccounts(List<Account> accList) {
         try {
             File accountFile = ACCOUNT_FILE;
-            System.out.println(accountFile);
             boolean deleted = accountFile.delete();
             FileOutputStream fileOutput = new FileOutputStream(accountFile);
-            ObjectOutputStream os = new ObjectOutputStream(fileOutput);
-            for (Account a : accList) {
-                os.writeObject(a);
+            try (ObjectOutputStream os = new ObjectOutputStream(fileOutput)) {
+                for (Account a : accList) {
+                    os.writeObject(a);
+                }
             }
-            os.close();
         } catch (IOException ex) {
             ex.printStackTrace();
         }

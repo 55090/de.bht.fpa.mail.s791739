@@ -15,10 +15,10 @@ import java.util.List;
 class TestAccountProvider {
 
 //  directory (relative to project) where the corresponding email folders can be found
-    public static final File TESTDATA_HOME = new File("TestData");
+    public static final File TESTDATA_HOME = new File("TestData");//D:/Daten/Studium/FPA/de.bht.fpa.mail.s791739/
 
     /**
-     * @eturn a list of accounts, with top folder paths which
+     * returns a list of accounts, with top folder paths which
      * refer to the folder with the testdata.
      */
     public static List<Account> createAccounts() {

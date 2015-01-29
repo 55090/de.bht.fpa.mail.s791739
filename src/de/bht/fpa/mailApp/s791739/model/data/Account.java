@@ -21,10 +21,10 @@ import java.io.Serializable;
  * @author Siamak Haschemi, changed by Simone Strippgen
  */
 
-public class Account implements Serializable {
-    
+public class Account implements Serializable{
+   
   private static final long serialVersionUID = -7660640539811469762L;
-
+  
   private String name;
 
   private String host;
@@ -80,6 +80,7 @@ public class Account implements Serializable {
     this.password = password;
   }
 
+  @Override
     public String toString() {
     StringBuilder s = new StringBuilder();
     s.append("[Account: ");

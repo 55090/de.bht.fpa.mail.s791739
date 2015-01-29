@@ -2,6 +2,7 @@ package de.bht.fpa.mailApp.s791739.controller;
 
 import de.bht.fpa.mailApp.s791739.model.ApplicationLogicIF;
 import de.bht.fpa.mailApp.s791739.model.applicationLogic.Facade;
+import de.bht.fpa.mailApp.s791739.model.data.Account;
 import de.bht.fpa.mailApp.s791739.model.data.Component;
 import de.bht.fpa.mailApp.s791739.model.data.Email;
 import de.bht.fpa.mailApp.s791739.model.data.FileElement;
@@ -49,10 +50,11 @@ import javafx.stage.StageStyle;
 /**
  * Controller Class for FXMLDocument
  * @author Marco Kollosche, András Bucsi (FPA Strippgen) Gruppe 4
- * @version Aufgabe 6 2014-12-15
+ * @version Aufgabe 8 2015-01-29
  */
 public class MainViewController implements Initializable {
     
+    // Format reference from EMail
     private static final DateFormat FORMAT = DateFormat.getDateTimeInstance( DateFormat.FULL, DateFormat.SHORT, Locale.GERMANY );
     
     // Image for the folder visualization
@@ -72,12 +74,6 @@ public class MainViewController implements Initializable {
     
     // Dummy Element to show arrow of branch expander
     private final static TreeItem<Component> DUMMY = new TreeItem<> ( new Folder(new File( "" ), true ) );
-    
-    // FolderManager
-    //private final FolderManagerIF folderManager;
-    
-    // E-Mail manager
-    //private final EmailManagerIF mailManager;
     
     // ApplicationLogic
     private final ApplicationLogicIF facade;
@@ -120,9 +116,6 @@ public class MainViewController implements Initializable {
                                sender    , 
                                recipients, 
                                subject   ;
-
-    /*@FXML
-    TableColumn<Email, Date> received;*/
          
     @FXML
     Label l_sender_placeholder  , 
@@ -171,25 +164,33 @@ public class MainViewController implements Initializable {
      * Method configures the Menu Items with event handler
      */
     private void configureMenue(){
-        loadAccountMenus();
         fileOpen   .setOnAction( ( event )-> handleMenueEvent( event ) );
         save       .setOnAction( ( event )-> handleMenueEvent( event ) );
         fileHistory.setOnAction( ( event )-> handleMenueEvent( event ) );
         newAccount .setOnAction( ( event )-> handleMenueEvent( event ) );
-        save.setDisable(true);
+        save.setDisable(true); 
+        loadAccountMenus();
+        
     }
     
+    /**
+     * Method loads menu items (accounts) dynamically to account menus 
+     * (open accound & edit account)
+     */
     private void loadAccountMenus(){
+        openAccount.getItems().clear();
+        editAccount.getItems().clear();
         final List<String> accounts = facade.getAllAccounts();
         for(final String account : accounts){
             final MenuItem open, edit;
             open = new MenuItem(account);
-            open.setUserData(facade.getAccount(account));
             edit = new MenuItem(account);
+            open.setUserData(facade.getAccount(account));
             edit.setUserData(facade.getAccount(account));
+            open.setOnAction( ( event )-> handleMenueEvent( event ) );
+            edit.setOnAction( ( event )-> handleMenueEvent( event ) );
             openAccount.getItems().add(open);
             editAccount.getItems().add(edit);
-            
         }
     }
     /**
@@ -256,36 +257,86 @@ public class MainViewController implements Initializable {
      */
     private void handleMenueEvent( final Event e ){
         File path;
-        switch( ( (MenuItem)e.getSource() ).getId() ){
+        final MenuItem item = (MenuItem)e.getSource();
+        String id = item.getId();
+        if(id == null){
+            id = item.getParentMenu().getId();
+        } 
+        switch( id ){
             case "FileOpen":
-                path = openDirectoryChooser("Select new Base Directory!"); 
-                if ( path == null ){
-                    System.err.println("No directory chosen!");    
-                    break;
-                } else{
-                    setTreeRoot( path );
-                    if ( path != DEFAULT_ROOTPATH ){
-                        historySet.add( path );
-                    }
-                }  
-                break;
+                            path = openDirectoryChooser("Select new Base Directory!"); 
+                            if ( path == null ){
+                                System.err.println("No directory chosen!");    
+                                break;
+                            } else{
+                                setTreeRoot( path );
+                                if ( path != DEFAULT_ROOTPATH ){
+                                    historySet.add( path );
+                                }
+                            }  
+                            break;
             case "Save": 
-                path = openDirectoryChooser("Select Directory to save emails!"); 
-                if ( path == null ){
-                    System.err.println("No directory chosen!");    
-                    break;
-                } else{
-                    facade.saveEmails(path);
-                }  
-                break;
-            case "FileHistory": showHistoryView(); 
-                break;
+                            path = openDirectoryChooser("Select Directory to save emails!"); 
+                            if ( path == null ){
+                                System.err.println("No directory chosen!");    
+                                break;
+                            } else{
+                                facade.saveEmails(path);
+                            }  
+                            break;
+            case "FileHistory": 
+                            showHistoryView(); 
+                            break;
                 
-             case "NewAccount": showCreateAccountView(); 
-                break;
+            case "NewAccount": 
+                            showCreateAccountView(null);
+                            break;
+            case "OpenAccount":
+                            facade.openAccount(item.getText());
+                            setTreeRoot(new File(facade.getAccount(item.getText()).getTop().getPath()));
+                            break;
+            case "EditAccount": 
+                            showCreateAccountView(facade.getAccount(item.getText()));
+                            break;
             default:
-                break;
+                            break;
         }
+    }
+    
+    /**
+     * Method saves newly created account
+     * @param account new account
+     */
+    protected void saveAccount( final Account account ){
+        facade.saveAccount(account);
+        loadAccountMenus();
+    }
+    
+    /**
+     * Method returns result of comparison with all account names with the 
+     * given name. If the name matches an existing account name then it 
+     * returns true, else false.
+     * @param name name of name creation
+     * @return result of check (true = taken // false = available)
+     */
+    protected boolean accountNameTaken( final String name ){
+        boolean result = false;
+        for (final String accName : facade.getAllAccounts()){
+            if(name.equals(accName)){
+                return true;
+            }
+        }
+        return result;
+    }
+    
+    
+    /**
+     * Method updates existing account
+     * @param account updated account
+     */
+    protected void updateAccount( final Account account ){
+        this.facade.updateAccount(account);
+        loadAccountMenus();
     }
     
     /**
@@ -298,6 +349,10 @@ public class MainViewController implements Initializable {
         return dc.showDialog( null );
     }
     
+    /**
+     * Method is called when an treeItem was selected
+     * @param item treeItem that was selected
+     */
     private void handleTreeSelection(final TreeItem<Component> item){
         handleEmailEvent(item);
         clearContentView();
@@ -466,14 +521,24 @@ public class MainViewController implements Initializable {
         }
     }
     
-    private void showCreateAccountView() {
+    /**
+     * Method configures a view that shows all fields that are required to setup an account
+     * either to create a new account (if the parameter account is null) or to edit (if it contains an actual account)
+     * @param account the referenced account
+     */
+    private void showCreateAccountView(final Account account) {
             Stage createAccountStage = new Stage(StageStyle.UTILITY);
-            createAccountStage.setTitle( "New Account" );
             URL location = getClass().getResource("/de/bht/fpa/mailApp/s791739/view/FXMLCreateAccount.fxml");
 
             FXMLLoader fxmlLoader = new FXMLLoader();
             fxmlLoader.setLocation(location);
-            fxmlLoader.setController(new CreateAccountController(facade));
+            if(account==null){
+                createAccountStage.setTitle( "New Account" );
+                fxmlLoader.setController(new CreateAccountController(this));
+            } else {
+                createAccountStage.setTitle( "Update Account" );
+                fxmlLoader.setController(new CreateAccountController(this, account));
+            }
             try {
                 Pane myPane = (Pane) fxmlLoader.load();
                 Scene myScene = new Scene(myPane);

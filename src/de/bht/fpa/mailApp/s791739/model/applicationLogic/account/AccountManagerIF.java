@@ -27,9 +27,9 @@ public interface AccountManagerIF {
     /**
      * Saves the given Account in the data store, if an account
      * with the given name does not exist.
+     * @param acc  the account that should be saved
      * @return  false, if an account with this name
      * already exists.
-     * @param account  the account that should be saved
      */
 
     boolean saveAccount(Account acc);

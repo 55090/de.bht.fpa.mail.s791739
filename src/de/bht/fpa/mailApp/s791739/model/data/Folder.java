@@ -12,15 +12,30 @@ import java.util.List;
  */
 public class Folder extends Component implements Serializable{
 
+    private Long id;
+    
     private final boolean expandable;
-    private final ArrayList<Component> content;
-    private final ArrayList<Email> emails;
+    
+    private final transient ArrayList<Component> content;
+            
+    private transient ArrayList<Email> emails;
+    
+    private Account account;
 
     public Folder( final File path, final boolean expandable ) {
         super( path );
         this.expandable = expandable;
         content         = new ArrayList<>();
         emails          = new ArrayList<>();
+    }
+    
+    /**
+     * serialization requires a standard constructor
+     */
+    public Folder(){
+        super(null);
+        content     = new ArrayList<>();
+        expandable  = false;
     }
 
     @Override
@@ -48,6 +63,21 @@ public class Folder extends Component implements Serializable{
     
     @Override
     public String toString(){
-        return super.toString()+(emails.size()>0?" ("+emails.size()+")":"");
+        if(this.emails.size()>0){
+            return super.toString()+" ("+emails.size()+")";
+        } else {
+            return super.toString();
+        }
+        
+    }
+    
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    public void setId(Long id) {
+        this.id = id;
     }
  }

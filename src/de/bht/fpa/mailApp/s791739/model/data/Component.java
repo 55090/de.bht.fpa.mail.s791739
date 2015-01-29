@@ -1,5 +1,6 @@
 package de.bht.fpa.mailApp.s791739.model.data;
 import java.io.File;
+import java.io.Serializable;
 import java.util.List;
 
 /*
@@ -7,14 +8,19 @@ import java.util.List;
  * 
  * @author Simone Strippgen
  */
-public abstract class Component {
-    // absolute directory path to this component
-    private String path;
-    // name of the component (without path)
+public abstract class Component implements Serializable{
+    // absolute directory pathF to this component
+    private String pathF;
+    // name of the component (without pathF)
     private String name;
+    
+    private Long id;
+
+    public Component() {
+    }
 
     public Component( final File path ) {
-        this.path = path.getAbsolutePath();
+        this.pathF = path.getAbsolutePath();
         this.name = path.getName();
     }
 
@@ -37,7 +43,7 @@ public abstract class Component {
      * @return 
      */
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public void setName( final String name ) {
@@ -45,15 +51,23 @@ public abstract class Component {
     }
 
     public void setPath( final String p ) {
-        path = p;
+        this.pathF = p;
     }
 
     public String getPath() {
-        return path;
+        return this.pathF;
     }
 
     @Override
     public String toString() {
-        return name;
+        return this.name;
+    }
+    
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }
