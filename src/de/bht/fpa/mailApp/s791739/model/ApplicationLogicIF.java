@@ -23,8 +23,8 @@ public interface ApplicationLogicIF {
     /**
      * Loads all relevant content in the directory path of a folder
      * into the folder.
-     * @param f the folder into which the content of the corresponding 
-     *          directory should be loaded
+     * @param folder the folder into which the content of the corresponding 
+     *               directory should be loaded
      */
     void loadContent(Folder folder);
 

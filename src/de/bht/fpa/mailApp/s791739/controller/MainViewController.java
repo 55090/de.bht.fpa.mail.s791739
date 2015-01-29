@@ -130,8 +130,6 @@ public class MainViewController implements Initializable {
      * Constructor
      */
     public MainViewController(){
-        //folderManager = new FileManager( DEFAULT_ROOTPATH );
-        //mailManager   = new XMLEmailManager();
         facade        = new Facade(DEFAULT_ROOTPATH);
         historySet    = new TreeSet<>();
     }

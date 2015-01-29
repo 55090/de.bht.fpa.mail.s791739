@@ -13,15 +13,15 @@ import java.util.List;
  * @author Kobe
  */
 public class AccountManager implements AccountManagerIF{
-    private final AccountDAOIF dao;
+    private final AccountDAOIF dbdao;
     
     public AccountManager(){
-        this.dao = new AccountFileDAO();
+        this.dbdao = new AccountDBDAO();
     }
 
     @Override
     public Account getAccount( final String name ) {
-        for( final Account account : this.dao.getAllAccounts() ){
+        for( final Account account : this.dbdao.getAllAccounts() ){
             if( account.getName().equals( name ) ){
                 return account;
             }
@@ -31,17 +31,17 @@ public class AccountManager implements AccountManagerIF{
 
     @Override
     public List<Account> getAllAccounts() {
-        return this.dao.getAllAccounts();
+        return this.dbdao.getAllAccounts();
     }
 
     @Override
     public boolean saveAccount( final Account acc ) {
-        return acc.equals( this.dao.saveAccount( acc ) );
+        return acc.equals( this.dbdao.saveAccount( acc ) );
     }
 
     @Override
     public boolean updateAccount( final Account account ) {
-        return this.dao.updateAccount( account );
+        return this.dbdao.updateAccount( account );
     }
     
 }

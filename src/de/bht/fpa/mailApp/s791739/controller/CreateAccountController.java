@@ -26,8 +26,8 @@ public class CreateAccountController implements Initializable{
      * false -> edit account
      */
     private final boolean newAccount;
+    
     private Account account;
-    private String backUpName;
 
     @FXML
     TextField ac_tf_name,
@@ -45,17 +45,25 @@ public class CreateAccountController implements Initializable{
     Button ac_b_saveAccount, 
            ac_b_cancel;
     
+    /**
+     * Contructor for new account setups
+     * @param mVCtrl MainViewController (because it wants to know everything)
+     */
     public CreateAccountController( final  MainViewController mVCtrl ){
         this.mVCtrl = mVCtrl; 
         account     = null;
-        newAccount  = ( account == null );
+        newAccount  = true;
     }
     
+    /**
+     * Constructor for update actions
+     * @param mVCtrl MainViewController (because it wants to know everything)
+     * @param account account that needs to be updated
+     */
     public CreateAccountController( final MainViewController mVCtrl, final Account account ){
         this.mVCtrl     = mVCtrl; 
         this.account    = account;
-        this.backUpName = account.getName();
-        newAccount      = ( account == null );
+        newAccount      = false;
     }
 
     @Override
@@ -73,6 +81,10 @@ public class CreateAccountController implements Initializable{
         }
     }
 
+    /**
+     * Method is a callback method for the button events from the view
+     * @param event event from the button click
+     */
     private void handleButtonEvent(ActionEvent event) {
         switch( ( (Button) event.getSource() ).getId() ){
             case "save":    
@@ -102,6 +114,11 @@ public class CreateAccountController implements Initializable{
         }
     }
 
+    /**
+     * Method validates all fields, as well as it checks whether the name entered 
+     * is already taken by another account
+     * @return boolean value (true = valid / false = invalid) 
+     */
     private boolean validateForm() {
         String message ="";
         if(ac_tf_name.getText().length()<1){
