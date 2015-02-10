@@ -28,13 +28,21 @@ public class XMLEmailManager implements EmailManagerIF {
     @Override
     public void loadEmails( final Folder folder ) {
         setCurrentFolder(folder);
-        if ( !this.currentFolder.getEmails().isEmpty() && new File(folder.getPath()).exists() ){
+        if ( !folder.getEmails().isEmpty() || !new File(folder.getPath()).exists()){
+            return;
+        }
+        for ( final File filePath : new File( folder.getPath() ).listFiles() ){
+            if( filePath.getName().endsWith(".xml") ){
+                folder.addEmail( JAXB.unmarshal( filePath, Email.class ) );
+            }
+        }
+        /*if ( !this.currentFolder.getEmails().isEmpty() && new File(folder.getPath()).exists() ){
             for ( final File filePath : new File( this.currentFolder.getPath() ).listFiles() ){
                 if( filePath.getName().endsWith(".xml") ){
                     this.currentFolder.addEmail( JAXB.unmarshal( filePath, Email.class ) );
                 }
             }
-        }
+        }*/
     }
     
     /**

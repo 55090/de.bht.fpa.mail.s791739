@@ -69,7 +69,11 @@ public class CreateAccountController implements Initializable{
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         ac_b_saveAccount.setOnAction((ActionEvent event) -> handleButtonEvent(event));
-        ac_b_saveAccount.setText("update");
+        if (!newAccount){
+            ac_b_saveAccount.setText("update");
+        } else {
+            ac_b_saveAccount.setText("save");
+        }
         ac_b_cancel.     setOnAction((ActionEvent event) -> handleButtonEvent(event));
         if(!newAccount){
             ac_tf_name.          setText(account.getName());

@@ -33,7 +33,7 @@ public class Facade implements ApplicationLogicIF{
      * @param path the initial directory path
      */
     public Facade(final File path){
-        this.folderManager    = new FolderManager(path);
+        this.folderManager  = new FolderManager(path);
         this.mailManager    = new XMLEmailManager();
         this.accountManager = new AccountManager();
         this.isRemote       = false;

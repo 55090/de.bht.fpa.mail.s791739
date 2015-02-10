@@ -70,7 +70,8 @@ public class IMapFolderManager implements FolderManagerIF{
                             } else {
                                 Folder dir = new Folder(new File(subDirectory.getName()), true);
                                 dir.setPath(subDirectory.getFullName());
-
+                                
+                                // source https://support.google.com/mail/answer/82367?hl=de
                                 if (subDirectory.getName().equals("[Gmail]")) {
                                     loadContent(dir);
                                     for (Component subFolder : dir.getComponents()) {
