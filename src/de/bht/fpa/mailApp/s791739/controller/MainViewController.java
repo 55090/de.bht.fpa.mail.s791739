@@ -67,7 +67,7 @@ public class MainViewController implements Initializable {
     private final Image FILE_ICON        = new Image( getClass().getResourceAsStream( "/de/bht/fpa/mailApp/s791739/model/data/icons/file_Icon.png" ) );
     
     // String of root path
-    private final static String S_DEFAULT_ROOTPATH = "./emails/Account";
+    private final static String S_DEFAULT_ROOTPATH = "/";
     
     // File for initial path
     private final static File DEFAULT_ROOTPATH     = new File( S_DEFAULT_ROOTPATH );

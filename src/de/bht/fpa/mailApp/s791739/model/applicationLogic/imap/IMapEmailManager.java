@@ -25,30 +25,32 @@ public class IMapEmailManager implements EmailManagerIF{
     
     
     @Override
-    public void loadEmails(Folder folder) {
+    public void loadEmails( final Folder folder ) {
         try{
             setCurrentFolder(folder);
-            if ( !this.currentFolder.getEmails().isEmpty() ){
-                final javax.mail.Folder dir = IMapConnectionHelper.connect(account).getFolder(folder.getPath());
+            
+            final javax.mail.Folder dir = IMapConnectionHelper.connect(account).getFolder(folder.getName());
 
-                if (dir.exists()) {
-                    int dirType = dir.getType();
-                        // 1 contains messages / 3 contain messages and folders
+            if (dir.exists()) {
+                System.out.println("Folder exists: "+dir.toString());
+                final int dirType = dir.getType();
+                    // 1 contains messages / 3 contain messages and folders
 
-                    if ( dirType == 1 || dirType == 3 && dir.exists() ) {
-                        dir.open( javax.mail.Folder.READ_ONLY );
-                        for ( final Message m : dir.getMessages() ) {
-                            Email message2emailConverted = IMapEmailConverter.convertMessage( m );
-                            folder.addEmail( message2emailConverted );
-                        }
-                        dir.close(true);
+                if ( dirType == 1 || dirType == 3 && dir.exists() ) {
+                    dir.open( javax.mail.Folder.READ_ONLY );
+                    for ( final Message m : dir.getMessages() ) {
+                        final Email message2emailConverted = IMapEmailConverter.convertMessage( m );
+                        folder.addEmail( message2emailConverted );
                     }
+                    dir.close(true);
                 }
-                dir.getStore().close();
+            } else {
+                    System.out.println("Folder doesnt exists: "+dir.toString());
             }
+            dir.getStore().close();
         } catch (Exception ex) {
             Logger.getLogger(IMapEmailManager.class.getName()).log(Level.SEVERE, null, ex);
-                }       
+        }       
     }
 
     @Override

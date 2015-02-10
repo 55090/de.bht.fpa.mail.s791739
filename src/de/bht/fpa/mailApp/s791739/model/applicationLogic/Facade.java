@@ -89,8 +89,9 @@ public class Facade implements ApplicationLogicIF{
     @Override
     public void changeDirectory(File file) {
         this.folderManager.setTopFolder(file);
-        mailManager = new XMLEmailManager();
-        isRemote = false;
+        if(!isRemote){
+            mailManager = new XMLEmailManager();
+        }
     }
 
     /**
@@ -98,22 +99,22 @@ public class Facade implements ApplicationLogicIF{
      * @param file selected directory path
      */
     @Override
-    public void saveEmails(File file) {
+    public void saveEmails( final File file ) {
         this.mailManager.saveEmails(file);
     }
 
     @Override
     public void openAccount( final String name ) {
-        Account account;
-        if (name.contains("Google")){
-            account         = this.accountManager.getAccount(name);
-            folderManager   = new IMapFolderManager(account);
-            mailManager     = new IMapEmailManager(account);
-            isRemote        = true;
+        final Account account = this.accountManager.getAccount( name );
+        changeDirectory( new File( account.getTop().getPath() ) );
+        if( name.contains("Google") ){
+            this.folderManager  = new IMapFolderManager( account );
+            this.mailManager    = new IMapEmailManager( account );
+            this.isRemote       = true;
         } else{
-             account = this.accountManager.getAccount(name);
-             folderManager = new FolderManager(new File(getAccount(name).getTop().getPath()));
-             changeDirectory(new File(account.getTop().getPath()));
+             this.mailManager   = new XMLEmailManager();
+             this.folderManager = new FolderManager( new File( getAccount( name ).getTop().getPath() ) );
+             this.isRemote      = false;
         }
     }
 
@@ -123,11 +124,14 @@ public class Facade implements ApplicationLogicIF{
      */
     @Override
     public List<String> getAllAccounts() {
-        List<String> accountNames = new ArrayList<>();
-        accountManager.getAllAccounts().stream().map((Account account) 
-                -> account.getName()).filter((String name) 
-                        -> (name!=null)).forEach((String name) 
-                                -> {accountNames.add(name);});
+        final List<String> accountNames = new ArrayList<>();
+        this.accountManager.getAllAccounts()
+                           .stream()
+                           .map( ( final Account account ) -> account.getName() )
+                           .filter( ( final String name )  -> ( name!=null ) )
+                           .forEach( ( final String name ) -> {
+                               accountNames.add(name);
+                           } );
         return accountNames;
     }
 
